@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  TabBarController.swift
 //  FocusOn
 //
 //  Created by Spencer Forrest on 23/09/2018.
@@ -8,13 +8,10 @@
 
 import UIKit
 
-class ViewController: UIViewController {
-
+class TabBarController: UITabBarController {
   override func viewDidLoad() {
     super.viewDidLoad()
-    // Do any additional setup after loading the view, typically from a nib.
+    // Load second tab bar item
+    self.selectedIndex = 1
   }
-
-
 }
-

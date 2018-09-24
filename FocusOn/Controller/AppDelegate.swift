@@ -13,9 +13,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   var window: UIWindow?
 
-
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    // Override point for customization after application launch.
+    // Instantiate dataController for Core Data
+    let dataController = DataController.init(xcdatamodeldName: Constant.datamodelName)
+    dataController.load()
+    // Dependency Injection to children view controllers
+    let tabBarController = window?.rootViewController as! TabBarController
+    for children in tabBarController.viewControllers ?? [] {
+      if var children = children as? ViewControllerProtocol {
+        children.dataController = dataController
+      }
+    }
     return true
   }
 
@@ -40,7 +48,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func applicationWillTerminate(_ application: UIApplication) {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
   }
-
-
 }
 
