@@ -24,6 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         children.dataController = dataController
       }
     }
+    print(NSHomeDirectory())
     return true
   }
 

@@ -8,16 +8,21 @@
 
 import UIKit
 
+protocol TaskTableViewCellDelegate {
+  func saveTask(text: String?, type: Type, tag index: Int) -> Void
+}
+
 class TaskTableViewCell: UITableViewCell {
-  
   
   @IBOutlet weak var textField: UITextField!
   @IBOutlet weak var numberLabel: UILabel!
   
+  var delegate: TaskTableViewCellDelegate?
+  
   override func awakeFromNib() {
     super.awakeFromNib()
     // Initialization code
-    numberLabel.layer.cornerRadius = numberLabel.frame.width * 0.35
+    numberLabel.layer.cornerRadius = numberLabel.bounds.height * 0.35
     numberLabel.clipsToBounds = true
     textField.delegate = self
   }
@@ -29,5 +34,9 @@ extension TaskTableViewCell: UITextFieldDelegate {
   func textFieldShouldReturn(_ textField: UITextField) -> Bool {
     self.endEditing(true)
     return true
+  }
+  
+  func textFieldDidEndEditing(_ textField: UITextField) {
+    delegate?.saveTask(text: textField.text, type: Type.task, tag: self.tag)
   }
 }

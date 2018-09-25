@@ -12,28 +12,41 @@ import CoreData
 class TodayViewController: UIViewController, ViewControllerProtocol {
   
   var dataController: DataController!
-  private var goalFecthResultsController: NSFetchedResultsController<Goal>!
+  private var goal: Focus?
+  private var tasks: [Focus]?
   
   @IBOutlet weak var tableView: UITableView!
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    tableView.delegate = self
-    tableView.dataSource = self
+    
+    configureDelegation()
     
     hideKeyboardWhenTappedAround()
     registerForKeyboardNotifications()
     
-    configure()
+    configureDataRequest()
   }
   
-  private func configure() {
-    let goalFecthRequest: NSFetchRequest<Goal> = Goal.fetchRequest()
-    let goalSortDescription = NSSortDescriptor(key: "creationDate", ascending: true)
-    goalFecthRequest.sortDescriptors = [goalSortDescription]
-    goalFecthRequest.predicate = datePredicate()
+  private func configureDelegation() {
+    tableView.delegate = self
+    tableView.dataSource = self
+  }
+  
+  private func configureDataRequest() {
+    let fetchRequest: NSFetchRequest<Focus> = Focus.fetchRequest()
+    let sortDescriptior = NSSortDescriptor(key: "date", ascending: true)
+    let todayPredicate = datePredicate()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [todayPredicate])
+    fetchRequest.sortDescriptors = [sortDescriptior]
+    let results = try! dataController.context.fetch(fetchRequest)
     
-    goalFecthResultsController = NSFetchedResultsController(fetchRequest: goalFecthRequest, managedObjectContext: dataController.context, sectionNameKeyPath: nil, cacheName: "Goal")
+    goal = results.filter { return $0.type == Type.goal.rawValue }.first
+    let filteredTasks = results.filter { return $0.type == Type.task.rawValue }
+    tasks = filteredTasks.isEmpty ? nil : filteredTasks
+    
+    print(goal ?? "NO GOAL")
+    print(tasks ?? "NO TASK")
   }
   
   private func datePredicate() -> NSCompoundPredicate {
@@ -48,9 +61,9 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
     // Note: Times are printed in UTC. Depending on where you live it won't print 00:00:00 but it will work with UTC times which can be converted to local time
     
     // Set predicate as date being today's date
-    let fromPredicate = NSPredicate(format: "creationDate >= %@", dateFrom as NSDate)
-    let toPredicate = NSPredicate(format: "creationDate < %@", dateTo as NSDate)
-    return NSCompoundPredicate(andPredicateWithSubpredicates: [fromPredicate, toPredicate])
+    let dateFromPredicate = NSPredicate(format: "date >= %@", dateFrom as NSDate)
+    let dateToPredicate = NSPredicate(format: "date < %@", dateTo as NSDate)
+    return NSCompoundPredicate(andPredicateWithSubpredicates: [dateFromPredicate, dateToPredicate])
   }
 }
 
@@ -77,23 +90,22 @@ extension TodayViewController: UITableViewDataSource {
     switch indexPath.section {
     case 0:
       if let cell = tableView.dequeueReusableCell(withIdentifier: Constant.goalCellId) as? GoalTableViewCell {
-        cell.textField.text = goalFecthResultsController.object(at: indexPath).title
+        cell.textField.text = goal?.title
+        cell.delegate = self
         return cell
       }
     case 1:
       if let cell = tableView.dequeueReusableCell(withIdentifier: Constant.taskCellId) as? TaskTableViewCell {
-        let goal: Goal = goalFecthResultsController.object(at: IndexPath(row: 0, section: 0))
-        var title = ""
-        cell.textField.text = ""
+        cell.textField.text = tasks?[indexPath.row].title
         cell.numberLabel.text = "\(indexPath.row + 1)"
+        cell.tag = indexPath.row
+        cell.delegate = self
         return cell
       }
     default: break
     }
-    let identifier = indexPath.section == 0 ? Constant.goalCellId : Constant.taskCellId
-    guard let cell = tableView.dequeueReusableCell(withIdentifier: identifier)
-      else { return UITableViewCell() }
-    return cell
+    
+    return UITableViewCell()
   }
   
   func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -115,12 +127,12 @@ extension TodayViewController {
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: keyboardWillHideNotification, object: nil)
   }
   
-  @objc func keyboardWillShow(notification: NSNotification) {
+  @objc private func keyboardWillShow(notification: NSNotification) {
     let keyboardFrame = notification.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! CGRect
     adjustLayoutForKeyboard(targetHeight: keyboardFrame.size.height)
   }
   
-  @objc func keyboardWillHide(notification: NSNotification){
+  @objc private func keyboardWillHide(notification: NSNotification){
     adjustLayoutForKeyboard(targetHeight: UIEdgeInsets.zero.bottom)
   }
   
@@ -132,12 +144,36 @@ extension TodayViewController {
 // -------------------------------------------------------------------------
 // MARK: - Keyboard dismissal
 extension TodayViewController {
-  func hideKeyboardWhenTappedAround() {
+  private func hideKeyboardWhenTappedAround() {
     let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
     view.addGestureRecognizer(tap)
   }
   
   @objc private func dismissKeyboard() {
     view.endEditing(true)
+  }
+}
+
+// -------------------------------------------------------------------------
+// MARK: - Goal tableview cell delegate
+extension TodayViewController: GoalTableViewCellDelegate {
+  func saveGoal(text: String?) {
+    let goal = self.goal == nil ? Focus(context: dataController.context) : self.goal
+    goal?.type = Type.goal.rawValue
+    goal?.date = Date()
+    goal?.title = text
+    try? dataController.context.save()
+  }
+}
+// FIXME: Similar functions - Tasks does not work
+// -------------------------------------------------------------------------
+// MARK: - Task tableview cell delegate
+extension TodayViewController: TaskTableViewCellDelegate {
+  func saveTask(text: String?, type: Type, tag index: Int) {
+    let task = tasks == nil ? Focus(context: dataController.context) : tasks?[index]
+    task?.type = type.rawValue
+    task?.date = Date()
+    task?.title = text
+    try? dataController.context.save()
   }
 }
