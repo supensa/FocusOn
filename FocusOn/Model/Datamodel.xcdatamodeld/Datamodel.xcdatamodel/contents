@@ -3,10 +3,11 @@
     <entity name="Focus" representedClassName="Focus" syncable="YES" codeGenerationType="class">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="isCompleted" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="order" optional="YES" attributeType="Integer 16" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" defaultValueString="NO TITLE" syncable="YES"/>
         <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Focus" positionX="-72" positionY="9" width="128" height="105"/>
+        <element name="Focus" positionX="-265" positionY="-109.828125" width="128" height="118"/>
     </elements>
 </model>

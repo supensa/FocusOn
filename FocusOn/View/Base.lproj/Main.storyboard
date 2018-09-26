@@ -71,7 +71,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="66.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Define task" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="i4m-Ic-ZSU">
+                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Define task" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="i4m-Ic-ZSU">
                                                     <rect key="frame" x="70" y="0.0" width="305" height="66.5"/>
                                                     <nil key="textColor"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -98,6 +98,7 @@
                                                 <constraint firstAttribute="trailing" secondItem="i4m-Ic-ZSU" secondAttribute="trailing" id="yiG-a0-KoN"/>
                                             </constraints>
                                         </tableViewCellContentView>
+                                        <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
                                         <connections>
                                             <outlet property="numberLabel" destination="aLK-NJ-NEN" id="CGX-lF-ie5"/>
                                             <outlet property="textField" destination="i4m-Ic-ZSU" id="aIU-3l-cXh"/>

@@ -9,14 +9,15 @@
 import UIKit
 
 protocol GoalTableViewCellDelegate {
-  func saveGoal(text: String?) -> Void
+  func processGoalInput(formerText: String?, text: String?, type: Type) -> Void
 }
 
 class GoalTableViewCell: UITableViewCell {
   
   @IBOutlet weak var textField: UITextField!
   
-  var delegate: GoalTableViewCellDelegate?
+  var delegate: TableViewCellDelegate?
+  var formerText: String?
   
   override func awakeFromNib() {
     super.awakeFromNib()
@@ -32,7 +33,14 @@ extension GoalTableViewCell: UITextFieldDelegate {
     return true
   }
   
+  func textFieldDidBeginEditing(_ textField: UITextField) {
+    formerText = textField.text
+    textField.text = ""
+  }
+  
   func textFieldDidEndEditing(_ textField: UITextField) {
-    self.delegate?.saveGoal(text: textField.text)
+    textField.text = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard formerText != textField.text else { return }
+    self.delegate?.processInput(formerText: formerText, text: textField.text, typeCell: .goal)
   }
 }

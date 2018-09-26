@@ -9,7 +9,7 @@
 import UIKit
 
 protocol TaskTableViewCellDelegate {
-  func saveTask(text: String?, type: Type, tag index: Int) -> Void
+  func processTaskInput(formerText: String?, text: String?, type: Type, tag index: Int) -> Void
 }
 
 class TaskTableViewCell: UITableViewCell {
@@ -17,13 +17,22 @@ class TaskTableViewCell: UITableViewCell {
   @IBOutlet weak var textField: UITextField!
   @IBOutlet weak var numberLabel: UILabel!
   
-  var delegate: TaskTableViewCellDelegate?
+  var delegate: TableViewCellDelegate?
+  private var formerText: String?
   
   override func awakeFromNib() {
     super.awakeFromNib()
     // Initialization code
+    setupRoundLabel()
+    textFieldDelegation()
+  }
+  
+  private func setupRoundLabel() {
     numberLabel.layer.cornerRadius = numberLabel.bounds.height * 0.35
     numberLabel.clipsToBounds = true
+  }
+  
+  private func textFieldDelegation() {
     textField.delegate = self
   }
 }
@@ -36,7 +45,14 @@ extension TaskTableViewCell: UITextFieldDelegate {
     return true
   }
   
+  func textFieldDidBeginEditing(_ textField: UITextField) {
+    formerText = textField.text
+    textField.text = ""
+  }
+  
   func textFieldDidEndEditing(_ textField: UITextField) {
-    delegate?.saveTask(text: textField.text, type: Type.task, tag: self.tag)
+    textField.text = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard formerText != textField.text else { return }
+    delegate?.processInput(formerText: formerText, text: textField.text, typeCell: .task, tag: self.tag)
   }
 }

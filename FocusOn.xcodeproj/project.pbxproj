@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		59051378215BBA6C0090AB1A /* TableViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59051377215BBA6C0090AB1A /* TableViewCellDelegate.swift */; };
 		5949FF232157F04C0029E984 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5949FF222157F04C0029E984 /* TabBarController.swift */; };
 		5949FF262157F97A0029E984 /* Datamodel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5949FF242157F97A0029E984 /* Datamodel.xcdatamodeld */; };
 		5949FF282157F9B20029E984 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5949FF272157F9B20029E984 /* DataController.swift */; };
@@ -26,6 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		59051377215BBA6C0090AB1A /* TableViewCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCellDelegate.swift; sourceTree = "<group>"; };
 		5949FF222157F04C0029E984 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		5949FF252157F97A0029E984 /* Datamodel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Datamodel.xcdatamodel; sourceTree = "<group>"; };
 		5949FF272157F9B20029E984 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
@@ -74,6 +76,7 @@
 			isa = PBXGroup;
 			children = (
 				59FDBD3C2157D38100A9AA1F /* LaunchScreen.storyboard */,
+				59051377215BBA6C0090AB1A /* TableViewCellDelegate.swift */,
 				59FDBD372157D37F00A9AA1F /* Main.storyboard */,
 				5995E8B32158532C002762D2 /* GoalTableViewCell.swift */,
 				5995E8B521585339002762D2 /* TaskTableViewCell.swift */,
@@ -194,6 +197,7 @@
 			files = (
 				5949FF282157F9B20029E984 /* DataController.swift in Sources */,
 				5949FF232157F04C0029E984 /* TabBarController.swift in Sources */,
+				59051378215BBA6C0090AB1A /* TableViewCellDelegate.swift in Sources */,
 				5949FF322158441D0029E984 /* ViewControllerProtocol.swift in Sources */,
 				59C4114D2159382E00FEB9D2 /* TypeEnum.swift in Sources */,
 				5949FF262157F97A0029E984 /* Datamodel.xcdatamodeld in Sources */,
