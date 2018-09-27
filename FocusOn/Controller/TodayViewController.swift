@@ -43,7 +43,7 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
       results = requestData(date: previousDate)
       // Update (tasks and goal) dates to today
       // FIXME: Remove to update dates to today
-//      updateDates(results)
+      //      updateDates(results)
     } else {
       // Request today's goal and tasks
       results = requestData(date: Date())
@@ -117,8 +117,25 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
 // -------------------------------------------------------------------------
 // MARK: - Table view delegate
 extension TodayViewController: UITableViewDelegate {
-  func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-    return indexPath.section != 0
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+    //    var focus: Focus!
+    //    switch indexPath.section {
+    //    case 0:
+    //      goal = goal ?? Focus(context: dataController.context)
+    //      focus = goal
+    //    default:
+    //      let index = indexPath.row
+    //      tasks[index] = tasks[index] ?? Focus(context: dataController.context)
+    //      focus = tasks[index]
+    //    }
+    //    focus.isCompleted = true
+    print("Selected")
+  }
+  
+  func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+    tableView.cellForRow(at: indexPath)?.accessoryType = .none
+    print("Deselected")
   }
 }
 
@@ -202,11 +219,29 @@ extension TodayViewController {
 extension TodayViewController {
   private func hideKeyboardWhenTappedAround() {
     let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+    tap.delegate = self
     view.addGestureRecognizer(tap)
   }
   
   @objc private func dismissKeyboard() {
     view.endEditing(true)
+  }
+}
+
+// -------------------------------------------------------------------------
+// MARK: - Gesture recognizer delegate
+extension TodayViewController: UIGestureRecognizerDelegate {
+  // Cells won't trigger UITapGestureRecognizer.
+  // No interference with keyboard dissmissal and edit textField.
+  func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+    if let view = touch.view {
+      for cell in tableView.visibleCells {
+        if view.isDescendant(of: cell) {
+          return false
+        }
+      }
+    }
+    return true
   }
 }
 

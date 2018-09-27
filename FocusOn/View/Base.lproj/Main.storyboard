@@ -36,7 +36,7 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" allowsMultipleSelection="YES" rowHeight="50" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="5io-gG-hPa">
                                 <rect key="frame" x="0.0" y="66" width="375" height="552"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
-                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="separatorColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="GoalCellId" rowHeight="56" id="OB9-th-xM4" customClass="GoalTableViewCell" customModule="FocusOn" customModuleProvider="target">
@@ -46,8 +46,8 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="55.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Set your goal..." minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="QvY-Fb-awQ">
-                                                    <rect key="frame" x="15" y="0.0" width="344" height="55.5"/>
+                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="line" placeholder="Set your goal..." minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="QvY-Fb-awQ">
+                                                    <rect key="frame" x="15" y="0.0" width="260" height="55.5"/>
                                                     <nil key="textColor"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -56,10 +56,11 @@
                                             <constraints>
                                                 <constraint firstAttribute="bottom" secondItem="QvY-Fb-awQ" secondAttribute="bottom" id="7Na-gR-pxq"/>
                                                 <constraint firstItem="QvY-Fb-awQ" firstAttribute="leading" secondItem="Pov-ez-hff" secondAttribute="leading" constant="15" id="EOw-aV-mvT"/>
+                                                <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="QvY-Fb-awQ" secondAttribute="trailing" constant="100" id="IBb-ed-PFM"/>
                                                 <constraint firstItem="QvY-Fb-awQ" firstAttribute="top" secondItem="Pov-ez-hff" secondAttribute="top" id="nlD-vL-RT6"/>
-                                                <constraint firstAttribute="trailing" secondItem="QvY-Fb-awQ" secondAttribute="trailing" constant="16" id="vVM-di-6He"/>
                                             </constraints>
                                         </tableViewCellContentView>
+                                        <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
                                         <connections>
                                             <outlet property="textField" destination="QvY-Fb-awQ" id="vCx-hT-p2b"/>
                                         </connections>
@@ -71,8 +72,8 @@
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="66.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Define task" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="i4m-Ic-ZSU">
-                                                    <rect key="frame" x="70" y="0.0" width="305" height="66.5"/>
+                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="line" placeholder="Define task" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="i4m-Ic-ZSU">
+                                                    <rect key="frame" x="70" y="0.0" width="205" height="66.5"/>
                                                     <nil key="textColor"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <textInputTraits key="textInputTraits"/>
@@ -91,11 +92,11 @@
                                             <constraints>
                                                 <constraint firstItem="i4m-Ic-ZSU" firstAttribute="leading" secondItem="aLK-NJ-NEN" secondAttribute="trailing" constant="10" id="B3v-8f-1xL"/>
                                                 <constraint firstAttribute="bottomMargin" secondItem="aLK-NJ-NEN" secondAttribute="bottom" id="dLf-kU-cZy"/>
+                                                <constraint firstAttribute="trailing" secondItem="i4m-Ic-ZSU" secondAttribute="trailing" constant="100" id="jeW-uQ-sHB"/>
                                                 <constraint firstItem="i4m-Ic-ZSU" firstAttribute="top" secondItem="ETw-T7-mmv" secondAttribute="top" id="mf1-NH-qOw"/>
                                                 <constraint firstItem="aLK-NJ-NEN" firstAttribute="leading" secondItem="ETw-T7-mmv" secondAttribute="leadingMargin" id="oAY-fY-S1B"/>
                                                 <constraint firstAttribute="bottom" secondItem="i4m-Ic-ZSU" secondAttribute="bottom" id="uQC-HB-LGX"/>
                                                 <constraint firstItem="aLK-NJ-NEN" firstAttribute="top" secondItem="ETw-T7-mmv" secondAttribute="topMargin" id="xxt-Yl-Xth"/>
-                                                <constraint firstAttribute="trailing" secondItem="i4m-Ic-ZSU" secondAttribute="trailing" id="yiG-a0-KoN"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
