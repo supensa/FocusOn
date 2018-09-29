@@ -33,76 +33,79 @@
                                     <constraint firstAttribute="height" constant="2" id="d50-lZ-v1Y"/>
                                 </constraints>
                             </view>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" allowsMultipleSelection="YES" rowHeight="50" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="5io-gG-hPa">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" allowsMultipleSelection="YES" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="5io-gG-hPa">
                                 <rect key="frame" x="0.0" y="66" width="375" height="552"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                                 <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="separatorColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="GoalCellId" rowHeight="56" id="OB9-th-xM4" customClass="GoalTableViewCell" customModule="FocusOn" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="55.5" width="375" height="56"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="GoalCellId" rowHeight="31" id="OB9-th-xM4" customClass="GoalTableViewCell" customModule="FocusOn" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="55.5" width="375" height="31"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="OB9-th-xM4" id="Pov-ez-hff">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="55.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="30.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="line" placeholder="Set your goal..." minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="QvY-Fb-awQ">
-                                                    <rect key="frame" x="15" y="0.0" width="260" height="55.5"/>
-                                                    <nil key="textColor"/>
+                                                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" text="Set your goal..." translatesAutoresizingMaskIntoConstraints="NO" id="q4z-ET-Tyt">
+                                                    <rect key="frame" x="16" y="0.0" width="294" height="30.5"/>
+                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                                </textField>
+                                                </textView>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="bottom" secondItem="QvY-Fb-awQ" secondAttribute="bottom" id="7Na-gR-pxq"/>
-                                                <constraint firstItem="QvY-Fb-awQ" firstAttribute="leading" secondItem="Pov-ez-hff" secondAttribute="leading" constant="15" id="EOw-aV-mvT"/>
-                                                <constraint firstAttribute="trailing" relation="lessThanOrEqual" secondItem="QvY-Fb-awQ" secondAttribute="trailing" constant="100" id="IBb-ed-PFM"/>
-                                                <constraint firstItem="QvY-Fb-awQ" firstAttribute="top" secondItem="Pov-ez-hff" secondAttribute="top" id="nlD-vL-RT6"/>
+                                                <constraint firstItem="q4z-ET-Tyt" firstAttribute="leading" secondItem="Pov-ez-hff" secondAttribute="leading" constant="16" id="H5o-dO-yfL"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="q4z-ET-Tyt" secondAttribute="trailing" constant="50" id="YD9-5N-jM2"/>
+                                                <constraint firstItem="q4z-ET-Tyt" firstAttribute="top" secondItem="Pov-ez-hff" secondAttribute="top" id="ZJe-t9-ssf"/>
+                                                <constraint firstAttribute="bottom" secondItem="q4z-ET-Tyt" secondAttribute="bottom" id="rOd-Wd-IlI"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
                                         <connections>
-                                            <outlet property="textField" destination="QvY-Fb-awQ" id="vCx-hT-p2b"/>
+                                            <outlet property="textView" destination="q4z-ET-Tyt" id="Npz-a5-Hvt"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="TaskCellId" rowHeight="67" id="Dac-Uw-kvC" customClass="TaskTableViewCell" customModule="FocusOn" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="111.5" width="375" height="67"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="TaskCellId" rowHeight="84" id="Dac-Uw-kvC" customClass="TaskTableViewCell" customModule="FocusOn" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="86.5" width="375" height="84"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Dac-Uw-kvC" id="ETw-T7-mmv">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="66.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="83.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="line" placeholder="Define task" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="i4m-Ic-ZSU">
-                                                    <rect key="frame" x="70" y="0.0" width="205" height="66.5"/>
-                                                    <nil key="textColor"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                    <textInputTraits key="textInputTraits"/>
-                                                </textField>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aLK-NJ-NEN">
-                                                    <rect key="frame" x="15" y="11" width="45" height="45"/>
+                                                    <rect key="frame" x="15" y="16" width="30" height="30"/>
                                                     <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="width" secondItem="aLK-NJ-NEN" secondAttribute="height" multiplier="1:1" id="iQ4-OA-Vmt"/>
+                                                        <constraint firstAttribute="width" constant="30" id="F4L-q4-0CA"/>
+                                                        <constraint firstAttribute="height" constant="30" id="hzf-O0-eGw"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" text="Define task" translatesAutoresizingMaskIntoConstraints="NO" id="ZNE-2Y-rju">
+                                                    <rect key="frame" x="61" y="16" width="264" height="57"/>
+                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                </textView>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="i4m-Ic-ZSU" firstAttribute="leading" secondItem="aLK-NJ-NEN" secondAttribute="trailing" constant="10" id="B3v-8f-1xL"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="aLK-NJ-NEN" secondAttribute="bottom" id="dLf-kU-cZy"/>
-                                                <constraint firstAttribute="trailing" secondItem="i4m-Ic-ZSU" secondAttribute="trailing" constant="100" id="jeW-uQ-sHB"/>
-                                                <constraint firstItem="i4m-Ic-ZSU" firstAttribute="top" secondItem="ETw-T7-mmv" secondAttribute="top" id="mf1-NH-qOw"/>
+                                                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="aLK-NJ-NEN" secondAttribute="bottom" id="BH9-4U-SAw"/>
+                                                <constraint firstItem="ZNE-2Y-rju" firstAttribute="leading" secondItem="aLK-NJ-NEN" secondAttribute="trailing" constant="16" id="SvZ-F8-pQK"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="ZNE-2Y-rju" secondAttribute="bottom" id="W5b-LN-aT6"/>
+                                                <constraint firstAttribute="trailing" secondItem="ZNE-2Y-rju" secondAttribute="trailing" constant="50" id="de0-zq-ilj"/>
+                                                <constraint firstItem="aLK-NJ-NEN" firstAttribute="top" secondItem="ETw-T7-mmv" secondAttribute="top" constant="16" id="f5S-rc-ZH4"/>
                                                 <constraint firstItem="aLK-NJ-NEN" firstAttribute="leading" secondItem="ETw-T7-mmv" secondAttribute="leadingMargin" id="oAY-fY-S1B"/>
-                                                <constraint firstAttribute="bottom" secondItem="i4m-Ic-ZSU" secondAttribute="bottom" id="uQC-HB-LGX"/>
-                                                <constraint firstItem="aLK-NJ-NEN" firstAttribute="top" secondItem="ETw-T7-mmv" secondAttribute="topMargin" id="xxt-Yl-Xth"/>
+                                                <constraint firstItem="ZNE-2Y-rju" firstAttribute="top" secondItem="ETw-T7-mmv" secondAttribute="topMargin" constant="5" id="ww2-xE-UKm"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
                                         <connections>
                                             <outlet property="numberLabel" destination="aLK-NJ-NEN" id="CGX-lF-ie5"/>
-                                            <outlet property="textField" destination="i4m-Ic-ZSU" id="aIU-3l-cXh"/>
+                                            <outlet property="textView" destination="ZNE-2Y-rju" id="AW3-Ul-XyR"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>

@@ -8,39 +8,35 @@
 
 import UIKit
 
-protocol GoalTableViewCellDelegate {
-  func processGoalInput(formerText: String?, text: String?, type: Type) -> Void
-}
-
 class GoalTableViewCell: UITableViewCell {
   
-  @IBOutlet weak var textField: UITextField!
+  @IBOutlet weak var textView: UITextView!
   
   var delegate: TableViewCellDelegate?
   var formerText: String?
   
   override func awakeFromNib() {
     super.awakeFromNib()
-    textField.delegate = self
+    textView.delegate = self
+    textView.isScrollEnabled = false
   }
 }
 
 // -------------------------------------------------------------------------
 // MARK: - Text field delegate
-extension GoalTableViewCell: UITextFieldDelegate {
-  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    self.endEditing(true)
-    return true
+extension GoalTableViewCell: UITextViewDelegate {
+  func textViewDidBeginEditing(_ textView: UITextView) {
+    formerText = textView.text
+    delegate?.resize(cell: self)
   }
   
-  func textFieldDidBeginEditing(_ textField: UITextField) {
-    formerText = textField.text
-    textField.text = ""
+  func textViewDidEndEditing(_ textView: UITextView) {
+    textView.text = textView.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard formerText != textView.text else { return }
+    self.delegate?.textFieldDidFinishEditing(text: textView.text, typeCell: .goal, tag: nil)
   }
   
-  func textFieldDidEndEditing(_ textField: UITextField) {
-    textField.text = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard formerText != textField.text else { return }
-    self.delegate?.processInput(formerText: formerText, text: textField.text, typeCell: .goal)
+  func textViewDidChange(_ textView: UITextView) {
+    delegate?.resize(cell: self)
   }
 }
