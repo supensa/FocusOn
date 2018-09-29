@@ -207,14 +207,6 @@ extension TodayViewController {
 // MARK: - Context updates
 extension TodayViewController {
   
-  /// Only remove this focus if it is a task.
-  /// Otherwise, remove all focuses for today
-  ///
-  /// - Parameter focus: focus to be removed
-  private func remove(focus: Focus) {
-    dataController.context.delete(focus)
-  }
-  
   /// Remove today's goal and tasks
   @objc private func removeAll() {
     guard goal != nil || tasks.count > 0
@@ -233,6 +225,14 @@ extension TodayViewController {
     tableView.reloadData()
     
     try? dataController.context.save()
+  }
+  
+  /// Only remove this focus if it is a task.
+  /// Otherwise, remove all focuses for today
+  ///
+  /// - Parameter focus: focus to be removed
+  private func remove(focus: Focus) {
+    dataController.context.delete(focus)
   }
   
   /// Update this focus
@@ -399,6 +399,7 @@ extension TodayViewController: TableViewCellDelegate {
   }
   
   func textFieldDidFinishEditing(text: String?, typeCell: Type, tag index: Int? = nil) {
+    updateTableViewUI()
     var focus: Focus!
     // Check if input comes from a GoalTableViewCell or TaskTableViewCell
     // Get NSManagedObject accordingly
