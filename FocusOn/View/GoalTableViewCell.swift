@@ -8,35 +8,12 @@
 
 import UIKit
 
-class GoalTableViewCell: UITableViewCell {
+class GoalTableViewCell: TableViewCell {
   
-  @IBOutlet weak var textView: UITextView!
-  
-  var delegate: TableViewCellDelegate?
-  var formerText: String?
+  @IBOutlet weak var title: UITextView!
   
   override func awakeFromNib() {
+    self.textView = title
     super.awakeFromNib()
-    textView.delegate = self
-    textView.isScrollEnabled = false
-  }
-}
-
-// -------------------------------------------------------------------------
-// MARK: - Text field delegate
-extension GoalTableViewCell: UITextViewDelegate {
-  func textViewDidBeginEditing(_ textView: UITextView) {
-    formerText = textView.text
-    delegate?.resize(cell: self)
-  }
-  
-  func textViewDidEndEditing(_ textView: UITextView) {
-    textView.text = textView.text?.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard formerText != textView.text else { return }
-    self.delegate?.textFieldDidFinishEditing(text: textView.text, typeCell: .goal, tag: nil)
-  }
-  
-  func textViewDidChange(_ textView: UITextView) {
-    delegate?.resize(cell: self)
   }
 }
