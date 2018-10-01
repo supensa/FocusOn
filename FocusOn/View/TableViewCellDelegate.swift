@@ -12,14 +12,12 @@ protocol TableViewCellDelegate {
   /// Called everytime a textField inside the cell finished to be edited
   ///
   /// - Parameters:
-  ///   - formerText: previous text
-  ///   - text: actual text
-  ///   - typeCell: goal or task cell
+  ///   - cell: cell containing the textView
   ///   - index: index of task cell
-  func textFieldDidFinishEditing(text: String?, typeCell: Type, tag index: Int?)
+  func textViewDidFinishEditing(cell: TableViewCell, tag index: Int?)
   /// Resize a cell accordingly to the text inside its textView.
   /// Keep the bottom of the cell visible on the screen
   ///
   /// - Parameter cell: cell to resize if needed
-  func resize(cell: UITableViewCell)
+  func resize(cell: TableViewCell)
 }
