@@ -17,6 +17,7 @@ class TaskTableViewCell: TableViewCell {
     self.textView = title
     super.awakeFromNib()
     setupRoundLabel()
+    placeHolderText = "Define task"
   }
   
   private func setupRoundLabel() {

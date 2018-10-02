@@ -12,8 +12,10 @@ class GoalTableViewCell: TableViewCell {
   
   @IBOutlet weak var title: UITextView!
   
+  
   override func awakeFromNib() {
     self.textView = title
     super.awakeFromNib()
+    placeHolderText = "Set your goal..."
   }
 }

@@ -208,6 +208,11 @@ extension TodayViewController {
       updateTableViewUI()
     }
   }
+  
+  private func trimming(textView: UITextView) {
+    textView.text = textView.text.trimmingCharacters(in: .whitespacesAndNewlines)
+    self.updateTableViewUI()
+  }
 }
 
 // -------------------------------------------------------------------------
@@ -248,12 +253,13 @@ extension TodayViewController {
   ///   - focus: focus to update
   ///   - type: type of focus (goal or task)
   ///   - text: title of focus
+  ///   - isCompleted: completion of focus
   ///   - index: order of task
-  private func update(focus: Focus, type: Type, text: String?, isCompleted: Bool? = nil, index: Int? = nil) {
+  private func update(focus: Focus, type: Type, text: String?, isCompleted: Bool? = nil, index: Int) {
     focus.type = type.rawValue
     focus.date = Date()
     focus.title = text
-    if let index = index, type == .task {
+    if type == .task {
       focus.order = Int16(index)
     }
     if let isCompleted = isCompleted {
@@ -322,25 +328,53 @@ extension TodayViewController: UIGestureRecognizerDelegate {
 // -------------------------------------------------------------------------
 // MARK: - Table view delegate
 extension TodayViewController: UITableViewDelegate {
-  // TODO: Work on checkmarks
+  // Process data when row is selected and checked
+  // and textView is not empty.
+  // If goal is selected and become checked then all tasks will be.
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let cell = tableView.cellForRow(at: indexPath) as? TableViewCell
       else { return }
-    if cell.textView.text != nil && cell.textView.text != "" {
-      cell.accessoryType = .checkmark
-      processCoreData(from: cell, index: indexPath.row)
-      print("Selected")
-    } else {
-      tableView.deselectRow(at: indexPath, animated: false)
-      cell.accessoryType = .none
+    
+    trimming(textView: cell.textView)
+    
+    if cell.textView.text != "" {
+      print("SPENCER: Selected")
+      view.endEditing(true)
     }
+    
+    let isGoalCell = indexPath.section == 0
+    let hasTitle = cell.textView.text != ""
+    
+    switch (isGoalCell, hasTitle) {
+    case (true, true):
+      manageGoalCellSelection(cell)
+    case (false, true):
+      manageTaskCellSelection(cell, indexPath: indexPath)
+    default:
+      cell.isSelected = false
+      cell.accessoryType = .none
+      return
+    }
+    tableView.reloadData()
+    try? dataController.context.save()
   }
   
+  // Process data when row is deselected and unchecked.
   func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
     guard let cell = tableView.cellForRow(at: indexPath) as? TableViewCell
       else { return }
-    cell.accessoryType = .none
-    processCoreData(from: cell, index: indexPath.row)
+    trimming(textView: cell.textView)
+    if cell.textView.text != "" {
+      view.endEditing(true)
+    }
+    switch indexPath.section {
+    case 0:
+      goal?.isCompleted = false
+    default:
+      manageTaskCellDeSelection(row: indexPath.row)
+    }
+    tableView.reloadData()
+    try? dataController.context.save()
     print("Deselected")
   }
   
@@ -353,6 +387,90 @@ extension TodayViewController: UITableViewDelegate {
     tableView.beginUpdates()
     tableView.endUpdates()
     UIView.setAnimationsEnabled(bool)
+  }
+  
+  /// Return the number of tasks without an empty title
+  ///
+  /// - Returns: Count of tasks
+  private func countTasksWithTitle() -> Int {
+    return tasks.filter {
+      let result = $1.title != ""
+      print("SPENCER: Tasks With title: \(result)")
+      return result
+      }.count
+  }
+  
+  private func countCompletedTasks() -> Int {
+    return tasks.filter {
+      let result = $1.isCompleted
+      print("SPENCER: Tasks is completed: \(result)")
+      return result
+      }.count
+  }
+  
+  /// set Focus (Goal or Task) as completed.
+  ///
+  /// - Parameters:
+  ///   - row: task's row
+  private func updateFocusAsCompleted(row: Int? = nil) {
+    if let row = row {
+      tasks[row]?.isCompleted = true
+    } else {
+      goal?.isCompleted = true
+    }
+  }
+  
+  /// check mark goal and tasks cell if all tasks have a title.
+  /// Otherwise, only check mark gaol cell.
+  /// Save changes into persistent store. (chekmark = isCompleted)
+  ///
+  /// - Parameter cell: goal cell to process
+  private func manageGoalCellSelection(_ cell: TableViewCell) {
+    let allTasksHaveTitle = countTasksWithTitle() == tasks.count
+    if allTasksHaveTitle {
+      updateFocusesAs(isCompleted: allTasksHaveTitle)
+    } else {
+      updateFocusAsCompleted()
+    }
+  }
+  
+  /// Check mark task and goal cell if all tasks are completed.
+  /// Otherwise, only check mark task cell.
+  /// Save changes into persistent store. (chekmark = isCompleted)
+  ///
+  /// - Parameter cell: task cell to process
+  private func manageTaskCellSelection(_ cell: TableViewCell, indexPath: IndexPath) {
+    let areCompletedTasks = countCompletedTasks() == tasks.count - 1
+    if areCompletedTasks {
+      if goal?.title != "" {
+        updateFocusesAs(isCompleted: areCompletedTasks)
+      }
+    } else {
+      updateFocusAsCompleted(row: indexPath.row)
+    }
+  }
+  
+  /// Set task as uncomplete and goal cell, if needed.
+  /// Save changes into persistent store. (chekmark = isCompleted)
+  ///
+  /// - Parameter cell: task cell to process
+  private func manageTaskCellDeSelection(row: Int) {
+    tasks[row]?.isCompleted = false
+    if goal?.isCompleted ?? false {
+      goal?.isCompleted = false
+    }
+  }
+  
+  /// Set goal and all tasks as completed or uncompleted and
+  /// save them into persistent store.
+  /// Then, reload the tableView's data.
+  ///
+  /// - Parameter isCompleted: true if tasks are completed
+  private func updateFocusesAs(isCompleted: Bool) {
+    goal?.isCompleted = isCompleted
+    for (_, task) in tasks {
+      task.isCompleted = isCompleted
+    }
   }
 }
 
@@ -372,11 +490,13 @@ extension TodayViewController: UITableViewDataSource {
     case 0:
       if let cell = tableView.dequeueReusableCell(withIdentifier: Constant.goalCellId) as? GoalTableViewCell {
         setupGoalCell(cell: cell, indexPath: indexPath)
+        cell.backgroundView?.backgroundColor = UIColor.blue
         return cell
       }
     case 1:
       if let cell = tableView.dequeueReusableCell(withIdentifier: Constant.taskCellId) as? TaskTableViewCell {
         setupTaskCell(cell: cell, indexPath: indexPath)
+        cell.backgroundView?.backgroundColor = UIColor.blue
         return cell
       }
     default: break
@@ -399,12 +519,18 @@ extension TodayViewController: UITableViewDataSource {
   ///   - cell: task cell
   ///   - row: cell's in table view
   private func setupGoalCell(cell: GoalTableViewCell, indexPath: IndexPath) {
-    cell.textView.text = goal?.title
+    if let title = goal?.title {
+      cell.textView.text = title
+    } else {
+      cell.setPlaceHolder()
+    }
     cell.textView.inputAccessoryView = accessoryView
     cell.delegate = self
+    setCellSelectionColor(cell: cell)
     let isSelected = goal?.isCompleted ?? false
     selectionRow(isSelected: isSelected, cell: cell, indexPath: indexPath)
   }
+  
   /// Setup task cell's label and text field
   ///
   /// - Parameters:
@@ -412,17 +538,22 @@ extension TodayViewController: UITableViewDataSource {
   ///   - row: cell's in table view
   private func setupTaskCell(cell: TaskTableViewCell, indexPath: IndexPath) {
     let row = indexPath.row
-    cell.textView.text = tasks[row]?.title
+    if let title = tasks[row]?.title {
+      cell.textView.text = title
+    } else {
+      cell.setPlaceHolder()
+    }
     cell.numberLabel.text = "\(row + 1)"
     cell.tag = row
     cell.textView.inputAccessoryView = accessoryView
     cell.delegate = self
+    setCellSelectionColor(cell: cell)
     let isSelected = tasks[row]?.isCompleted ?? false
     selectionRow(isSelected: isSelected, cell: cell, indexPath: indexPath)
   }
   
   /// Select or deselect a row in tableView.
-  /// Checkmark or uncheckmark a cell
+  /// check mark or uncheck mark a cell
   ///
   /// - Parameters:
   ///   - isSelected: cell should be selected
@@ -439,12 +570,22 @@ extension TodayViewController: UITableViewDataSource {
       cell.accessoryType = .none
     }
   }
+  
+  /// Set the selection color that will apply
+  ///
+  /// - Parameters:
+  ///   - color: Selection color
+  ///   - cell: cell to apply it
+  private func setCellSelectionColor(cell: UITableViewCell) {
+    cell.selectedBackgroundView = UIView()
+    cell.selectedBackgroundView?.backgroundColor = UIColor(r: 239, g: 239, b: 244, alpha: 1)
+  }
 }
 
 // -------------------------------------------------------------------------
 // MARK: - tableview cell delegate
 extension TodayViewController: TableViewCellDelegate {
-  func resize(cell: TableViewCell) {
+  func dynamicSize(cell: TableViewCell) {
     updateTableViewUI()
     // Keep the bottom of the cell visible on the screen
     if let indexPath = tableView.indexPath(for: cell) {
@@ -452,11 +593,11 @@ extension TodayViewController: TableViewCellDelegate {
     }
   }
   
-  func textViewDidFinishEditing(cell: TableViewCell, tag index: Int?) {
+  func textViewDidFinishEditing(cell: TableViewCell, tag index: Int) {
     updateTableViewUI()
     // No need to save if no changes
     guard cell.formerText != cell.textView.text else { return }
-    processCoreData(from: cell, index: index)
+    processData(from: cell, index: index)
   }
   
   /// Update or remove a "Focus" from context and persistent store
@@ -464,9 +605,10 @@ extension TodayViewController: TableViewCellDelegate {
   /// - Parameters:
   ///   - cell: cell containing the data
   ///   - index: Order of the cell (for tasks cell)
-  private func processCoreData(from cell: TableViewCell, index: Int?) {
+  private func processData(from cell: TableViewCell, index: Int) {
     var focus: Focus!
     var typeCell: Type!
+    var isNewTask: Bool = false
     // Check if input comes from a GoalTableViewCell or TaskTableViewCell
     // Get NSManagedObject accordingly
     if let _ = cell as? GoalTableViewCell {
@@ -475,22 +617,35 @@ extension TodayViewController: TableViewCellDelegate {
       typeCell = .goal
     }
     if let _ = cell as? TaskTableViewCell {
-      tasks[index!] = tasks[index!] ?? Focus(context: dataController.context)
-      focus = tasks[index!]
+      if tasks[index] == nil { isNewTask = true }
+      tasks[index] = tasks[index] ?? Focus(context: dataController.context)
+      focus = tasks[index]
       typeCell = .task
     }
     // NSManagedObject will be removed if text is empty.
     // Otherwise, it will be updated
     if cell.textView.text == "" {
       remove(focus: focus)
-      if typeCell == .task { tasks[index!] = nil }
+      if typeCell == .task { tasks[index] = nil }
       if typeCell == .goal { goal = nil }
     } else {
       let isCompleted = cell.accessoryType == .checkmark
       update(focus: focus, type: typeCell, text: cell.textView.text, isCompleted: isCompleted, index: index)
+      deselectGoalCell(isNewTask)
     }
     // Commit the change to context and persistent store
     try? dataController.context.save()
     print("SPENCER: Saved into Persistent Store")
+  }
+  
+  /// Set goal as not completed,
+  /// then reload the tableView's data.
+  ///
+  /// - Parameter isNeeded: force the deselection
+  private func deselectGoalCell(_ forced: Bool) {
+    if forced {
+      goal?.isCompleted = false
+      tableView.reloadData()
+    }
   }
 }

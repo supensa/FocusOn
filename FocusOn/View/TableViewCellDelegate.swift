@@ -13,11 +13,11 @@ protocol TableViewCellDelegate {
   ///
   /// - Parameters:
   ///   - cell: cell containing the textView
-  ///   - index: index of task cell
-  func textViewDidFinishEditing(cell: TableViewCell, tag index: Int?)
+  ///   - index: index used for task cell
+  func textViewDidFinishEditing(cell: TableViewCell, tag index: Int)
   /// Resize a cell accordingly to the text inside its textView.
   /// Keep the bottom of the cell visible on the screen
   ///
   /// - Parameter cell: cell to resize if needed
-  func resize(cell: TableViewCell)
+  func dynamicSize(cell: TableViewCell)
 }

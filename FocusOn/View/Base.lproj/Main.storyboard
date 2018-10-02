@@ -33,21 +33,21 @@
                                     <constraint firstAttribute="height" constant="2" id="d50-lZ-v1Y"/>
                                 </constraints>
                             </view>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" allowsMultipleSelection="YES" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="5io-gG-hPa">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="none" allowsMultipleSelection="YES" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="5io-gG-hPa">
                                 <rect key="frame" x="0.0" y="66" width="375" height="552"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                                 <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="separatorColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="gray" indentationWidth="10" reuseIdentifier="GoalCellId" rowHeight="31" id="OB9-th-xM4" customClass="GoalTableViewCell" customModule="FocusOn" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="55.5" width="375" height="31"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="GoalCellId" rowHeight="45" id="OB9-th-xM4" customClass="GoalTableViewCell" customModule="FocusOn" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="55.5" width="375" height="45"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="OB9-th-xM4" id="Pov-ez-hff">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="30.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="45"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" text="Set your goal..." translatesAutoresizingMaskIntoConstraints="NO" id="q4z-ET-Tyt">
-                                                    <rect key="frame" x="16" y="0.0" width="294" height="30.5"/>
+                                                    <rect key="frame" x="16" y="5" width="294" height="35"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -56,33 +56,34 @@
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="q4z-ET-Tyt" firstAttribute="leading" secondItem="Pov-ez-hff" secondAttribute="leading" constant="16" id="H5o-dO-yfL"/>
+                                                <constraint firstItem="q4z-ET-Tyt" firstAttribute="top" secondItem="Pov-ez-hff" secondAttribute="top" constant="5" id="Ia6-0I-cGJ"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="q4z-ET-Tyt" secondAttribute="trailing" constant="50" id="YD9-5N-jM2"/>
-                                                <constraint firstItem="q4z-ET-Tyt" firstAttribute="top" secondItem="Pov-ez-hff" secondAttribute="top" id="ZJe-t9-ssf"/>
-                                                <constraint firstAttribute="bottom" secondItem="q4z-ET-Tyt" secondAttribute="bottom" id="rOd-Wd-IlI"/>
+                                                <constraint firstAttribute="bottom" secondItem="q4z-ET-Tyt" secondAttribute="bottom" constant="5" id="lxU-Ky-gnJ"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
+                                        <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <connections>
                                             <outlet property="title" destination="q4z-ET-Tyt" id="Npz-a5-Hvt"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="gray" indentationWidth="10" reuseIdentifier="TaskCellId" rowHeight="73" id="Dac-Uw-kvC" customClass="TaskTableViewCell" customModule="FocusOn" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="86.5" width="375" height="73"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="TaskCellId" rowHeight="73" id="Dac-Uw-kvC" customClass="TaskTableViewCell" customModule="FocusOn" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="100.5" width="375" height="73"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Dac-Uw-kvC" id="ETw-T7-mmv">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="72.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="73"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aLK-NJ-NEN">
                                                     <rect key="frame" x="15" y="16" width="30" height="30"/>
                                                     <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="30" id="F4L-q4-0CA"/>
                                                         <constraint firstAttribute="height" constant="30" id="hzf-O0-eGw"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                    <nil key="highlightedColor"/>
                                                 </label>
                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" text="Define task" translatesAutoresizingMaskIntoConstraints="NO" id="ZNE-2Y-rju">
                                                     <rect key="frame" x="61" y="16" width="214" height="46"/>
@@ -103,6 +104,7 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
+                                        <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <connections>
                                             <outlet property="numberLabel" destination="aLK-NJ-NEN" id="CGX-lF-ie5"/>
                                             <outlet property="title" destination="ZNE-2Y-rju" id="AW3-Ul-XyR"/>
