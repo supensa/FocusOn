@@ -16,6 +16,6 @@ class GoalTableViewCell: TableViewCell {
   override func awakeFromNib() {
     self.textView = title
     super.awakeFromNib()
-    placeHolderText = "Set your goal..."
+    placeHolderText = Constant.goalPlaceHolder
   }
 }

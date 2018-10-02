@@ -14,7 +14,7 @@ class TableViewCell: UITableViewCell {
   
   var delegate: TableViewCellDelegate?
   var formerText: String?
-  var placeHolderText = "Insert Text here..."
+  var placeHolderText = Constant.focusPlaceHolder
     
   override func awakeFromNib() {
     super.awakeFromNib()
@@ -24,7 +24,7 @@ class TableViewCell: UITableViewCell {
   }
   
   func setPlaceHolder() {
-    textView.textColor = UIColor(r: 200, g: 200, b: 200, alpha: 1)
+    textView.textColor = Constant.placeHolderColor
     textView.text = placeHolderText
   }
   

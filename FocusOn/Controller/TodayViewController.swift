@@ -578,7 +578,7 @@ extension TodayViewController: UITableViewDataSource {
   ///   - cell: cell to apply it
   private func setCellSelectionColor(cell: UITableViewCell) {
     cell.selectedBackgroundView = UIView()
-    cell.selectedBackgroundView?.backgroundColor = UIColor(r: 239, g: 239, b: 244, alpha: 1)
+    cell.selectedBackgroundView?.backgroundColor = Constant.selectionBackgroundColor
   }
 }
 
