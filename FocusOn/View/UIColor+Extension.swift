@@ -12,4 +12,6 @@ extension UIColor {
   convenience init(r: CGFloat, g: CGFloat, b: CGFloat, alpha: CGFloat) {
     self.init(red: r/255, green: g/255, blue: b/255, alpha: alpha)
   }
+  
+  static let darkGreen = UIColor(r: 0, g: 100, b: 0, alpha: 1)
 }

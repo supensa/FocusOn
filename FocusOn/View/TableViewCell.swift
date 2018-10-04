@@ -28,7 +28,11 @@ class TableViewCell: UITableViewCell {
     textView.text = placeHolderText
   }
   
-  func setupTextViewBorder() {
+  func isPlaceHolderSet() -> Bool {
+    return textView.text == placeHolderText
+  }
+  
+  private func setupTextViewBorder() {
     self.textView.layer.borderWidth = 1.0;
     self.textView.layer.borderColor = UIColor.lightGray.cgColor
     self.textView.layer.cornerRadius = 8;

@@ -17,13 +17,17 @@ struct Constant {
   static let taskCellId = "TaskCellId"
   
   static let taskCompletion = "Great job on making progress!"
-  static let goalCompletion = "Congrats on achieving your goal!"
   static let taskAttempt = "ah, no biggie, you’ll get it next time!"
   
   static let taskPlaceHolder = "Define task"
   static let goalPlaceHolder = "Set your goal..."
   static let focusPlaceHolder = "Write text here"
   static let placeHolderColor = UIColor(r: 200, g: 200, b: 200, alpha: 1)
+  
+  static let goalCompleted = "Congratulation !"
+  static let goalUncompleted = "Goal for the day to focus on:"
+  static let taskCompleted = "All tasks completed !"
+  static let taskUncompleted = " more to achieve your goal"
   
   static let selectionBackgroundColor = UIColor(r: 239, g: 239, b: 244, alpha: 1)
 }

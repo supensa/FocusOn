@@ -22,17 +22,23 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
   private var clearButton: UIButton!
   private var deleteAllButton: UIButton!
   
+  private var goalHeaderLabel: UILabel!
+  private var taskHeaderLabel: UILabel!
+  private var triggerGoalAnimation = false
+  private var triggerTaskAnimation = false
+  private var taskUnchecked = false
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
     requestData()
-    configureDelegation()
+    tableViewDelegation()
     hideKeyboardWhenTappedAround()
     registerForKeyboardNotifications()
     setupAccessoryView()
   }
   
-  private func configureDelegation() {
+  private func tableViewDelegation() {
     tableView.delegate = self
     tableView.dataSource = self
   }
@@ -48,8 +54,7 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
       let previousDate = goal.date!
       results = requestData(date: previousDate)
       // Update (tasks and goal) dates to today
-      // FIXME: Remove to update dates to today
-      //      updateDates(results)
+      updateDates(results)
     } else {
       // Request today's goal and tasks
       results = requestData(date: Date())
@@ -63,8 +68,8 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
       tasks[index] = result
     }
     
-    print(goal ?? "NO GOAL")
-    print(tasks)
+    print("SPENCER: \(String(describing: goal))")
+    print("SPENCER: \(tasks)")
   }
   
   private func updateDates(_ results: [Focus]?) {
@@ -90,7 +95,7 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
   /// - Returns: last uncompleted goal if any
   private func requestPreviousDayGoal() -> Focus? {
     let fetchRequest: NSFetchRequest<Focus> = Focus.fetchRequest()
-    let sortDescriptior = NSSortDescriptor(key: "date", ascending: true)
+    let sortDescriptior = NSSortDescriptor(key: "date", ascending: false)
     let goalPredicate = NSPredicate(format: "type = %@", Type.goal.rawValue)
     let completedPredicate = NSPredicate(format: "isCompleted = %@", NSNumber(value: false))
     let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [goalPredicate, completedPredicate])
@@ -167,7 +172,7 @@ extension TodayViewController {
   private func setupClearButton() {
     clearButton = UIButton(type: .custom)
     clearButton.setTitle("Clear", for: .normal)
-    clearButton.setTitleColor(UIColor.blue, for: .normal)
+    clearButton.setTitleColor(UIColor.red, for: .normal)
     clearButton.addTarget(self, action: #selector(clearButtonTapped), for: .touchUpInside)
     clearButton.showsTouchWhenHighlighted = true
   }
@@ -175,7 +180,7 @@ extension TodayViewController {
   private func setupSaveButton() {
     saveButton = UIButton(type: .custom)
     saveButton.setTitle("Save", for: .normal)
-    saveButton.setTitleColor(UIColor.blue, for: .normal)
+    saveButton.setTitleColor(UIColor.darkGreen, for: .normal)
     saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
     saveButton.showsTouchWhenHighlighted = true
   }
@@ -248,6 +253,7 @@ extension TodayViewController {
   }
   
   /// Update this focus
+  /// Update all the focuses'date
   ///
   /// - Parameters:
   ///   - focus: focus to update
@@ -255,16 +261,18 @@ extension TodayViewController {
   ///   - text: title of focus
   ///   - isCompleted: completion of focus
   ///   - index: order of task
-  private func update(focus: Focus, type: Type, text: String?, isCompleted: Bool? = nil, index: Int) {
+  private func update(focus: Focus, type: Type, text: String?, index: Int) {
     focus.type = type.rawValue
-    focus.date = Date()
     focus.title = text
     if type == .task {
       focus.order = Int16(index)
     }
-    if let isCompleted = isCompleted {
-      focus.isCompleted = isCompleted
+    let date = Date()
+    // update date of all tasks and goal
+    for (_,task) in tasks {
+      task.date = date
     }
+    goal?.date = date
   }
 }
 
@@ -273,7 +281,6 @@ extension TodayViewController {
 extension TodayViewController {
   
   private func registerForKeyboardNotifications() {
-    // FIXME: Remove Notification at the end
     let keyboardWillShowNotification = UIResponder.keyboardWillShowNotification
     let keyboardWillHideNotification = UIResponder.keyboardWillHideNotification
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: keyboardWillShowNotification, object: nil)
@@ -338,12 +345,11 @@ extension TodayViewController: UITableViewDelegate {
     trimming(textView: cell.textView)
     
     if cell.textView.text != "" {
-      print("SPENCER: Selected")
       view.endEditing(true)
     }
     
     let isGoalCell = indexPath.section == 0
-    let hasTitle = cell.textView.text != ""
+    let hasTitle = !(cell.isPlaceHolderSet() || cell.textView.text == "")
     
     switch (isGoalCell, hasTitle) {
     case (true, true):
@@ -375,7 +381,94 @@ extension TodayViewController: UITableViewDelegate {
     }
     tableView.reloadData()
     try? dataController.context.save()
-    print("Deselected")
+  }
+  
+  func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    if section == 0 {
+      goalHeaderLabel = UILabel()
+    } else {
+      taskHeaderLabel = UILabel()
+    }
+    
+    let view = UIView()
+    
+    let label: UILabel = section == 0 ? goalHeaderLabel : taskHeaderLabel
+    
+    view.addSubview(label)
+    label.translatesAutoresizingMaskIntoConstraints = false
+    label.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+    label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
+    
+    var title: String?
+    
+    if section == 0 {
+      label.font = label.font.withSize(23)
+      title = goal?.isCompleted ?? false ? Constant.goalCompleted : Constant.goalUncompleted
+      label.textColor = goal?.isCompleted ?? false ? UIColor.red : UIColor.black
+    }
+    if section == 1 {
+      let count = countCompletedTasks()
+      let condition = tasks.count == count && tasks.count != 0
+      title = condition ? Constant.taskCompleted : "\(tasks.count - count)" + Constant.taskUncompleted
+    }
+    
+    label.text = title
+    
+    if triggerGoalAnimation && section == 0 { goalCompletionAnimation() }
+    if triggerTaskAnimation && section == 1 { taskAnimation(isUncheckedTask: taskUnchecked) }
+    
+    return view
+  }
+  
+  private func taskAnimation(isUncheckedTask: Bool) {
+    let temporaryMessage = taskUnchecked ? "Ah, no biggie, you’ll get it next time!" : "Great job on making progress!"
+    let color = taskUnchecked ? UIColor.red : UIColor.darkGreen
+    
+    let text = self.taskHeaderLabel.text
+    self.taskHeaderLabel.alpha = 0
+    self.taskHeaderLabel.textColor = color
+    self.taskHeaderLabel.text = temporaryMessage
+    
+    let animation = { self.taskHeaderLabel.alpha = 0 }
+    
+    let completion = {
+      (completed: Bool) in
+      if completed {
+        self.taskHeaderLabel.textColor = UIColor.black
+        self.taskHeaderLabel.text = text
+        UIView.animate(withDuration: 0.5) { self.taskHeaderLabel.alpha = 1 }
+      }
+    }
+    
+    let mainCompletion = {
+      (completed: Bool) in
+      if completed {
+        UIView.animate(withDuration: 0.5, delay: 0.5, options: [], animations: animation, completion: completion)
+      }
+    }
+    
+    UIView.setAnimationsEnabled(true)
+    UIView.animate(withDuration: 0.5, animations: { self.taskHeaderLabel.alpha = 1 }, completion: mainCompletion)
+    
+    triggerTaskAnimation = false
+    taskUnchecked = false
+  }
+  
+  private func goalCompletionAnimation() {
+    UIView.setAnimationsEnabled(true)
+    
+    UIView.animate(withDuration: 0.6) { () -> Void in
+      self.goalHeaderLabel.transform = CGAffineTransform(rotationAngle: CGFloat.pi)
+      self.goalHeaderLabel.transform = CGAffineTransform(scaleX: 2, y: 2)
+    }
+
+    UIView.animate(withDuration: 0.6, delay: 0.3, options: UIView.AnimationOptions.curveEaseIn, animations: {
+      () -> Void in
+      self.goalHeaderLabel.transform = CGAffineTransform(rotationAngle: CGFloat.pi * 2.0)
+//      self.goalHeaderLabel.transform = CGAffineTransform.identity
+    }, completion: nil)
+    
+    triggerGoalAnimation = false
   }
   
   /// Request tableView to update its UI
@@ -386,7 +479,7 @@ extension TodayViewController: UITableViewDelegate {
     UIView.setAnimationsEnabled(bool)
     tableView.beginUpdates()
     tableView.endUpdates()
-    UIView.setAnimationsEnabled(bool)
+    UIView.setAnimationsEnabled(true)
   }
   
   /// Return the number of tasks without an empty title
@@ -395,7 +488,6 @@ extension TodayViewController: UITableViewDelegate {
   private func countTasksWithTitle() -> Int {
     return tasks.filter {
       let result = $1.title != ""
-      print("SPENCER: Tasks With title: \(result)")
       return result
       }.count
   }
@@ -403,21 +495,8 @@ extension TodayViewController: UITableViewDelegate {
   private func countCompletedTasks() -> Int {
     return tasks.filter {
       let result = $1.isCompleted
-      print("SPENCER: Tasks is completed: \(result)")
       return result
       }.count
-  }
-  
-  /// set Focus (Goal or Task) as completed.
-  ///
-  /// - Parameters:
-  ///   - row: task's row
-  private func updateFocusAsCompleted(row: Int? = nil) {
-    if let row = row {
-      tasks[row]?.isCompleted = true
-    } else {
-      goal?.isCompleted = true
-    }
   }
   
   /// check mark goal and tasks cell if all tasks have a title.
@@ -459,6 +538,8 @@ extension TodayViewController: UITableViewDelegate {
     if goal?.isCompleted ?? false {
       goal?.isCompleted = false
     }
+    taskUnchecked = true
+    triggerTaskAnimation = true
   }
   
   /// Set goal and all tasks as completed or uncompleted and
@@ -470,6 +551,21 @@ extension TodayViewController: UITableViewDelegate {
     goal?.isCompleted = isCompleted
     for (_, task) in tasks {
       task.isCompleted = isCompleted
+    }
+    triggerGoalAnimation = true
+  }
+  
+  /// set Focus (Goal or Task) as completed.
+  ///
+  /// - Parameters:
+  ///   - row: task's row
+  private func updateFocusAsCompleted(row: Int? = nil) {
+    if let row = row {
+      tasks[row]?.isCompleted = true
+      triggerTaskAnimation = true
+    } else {
+      goal?.isCompleted = true
+      triggerGoalAnimation = true
     }
   }
 }
@@ -490,13 +586,11 @@ extension TodayViewController: UITableViewDataSource {
     case 0:
       if let cell = tableView.dequeueReusableCell(withIdentifier: Constant.goalCellId) as? GoalTableViewCell {
         setupGoalCell(cell: cell, indexPath: indexPath)
-        cell.backgroundView?.backgroundColor = UIColor.blue
         return cell
       }
     case 1:
       if let cell = tableView.dequeueReusableCell(withIdentifier: Constant.taskCellId) as? TaskTableViewCell {
         setupTaskCell(cell: cell, indexPath: indexPath)
-        cell.backgroundView?.backgroundColor = UIColor.blue
         return cell
       }
     default: break
@@ -505,12 +599,9 @@ extension TodayViewController: UITableViewDataSource {
     return UITableViewCell()
   }
   
+  // Implemented without returning "" or nil gives a dynamic height to header sections
   func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-    return section == 0 ? "Goal for the day to focus on:" : "3 tasks to achieve your goal"
-  }
-  
-  func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-    return section == 0 ? Constant.goalCompletion : Constant.taskAttempt
+    return "default"
   }
   
   /// Setup goal cell's text field
@@ -521,6 +612,7 @@ extension TodayViewController: UITableViewDataSource {
   private func setupGoalCell(cell: GoalTableViewCell, indexPath: IndexPath) {
     if let title = goal?.title {
       cell.textView.text = title
+      cell.textView.textColor = UIColor.black
     } else {
       cell.setPlaceHolder()
     }
@@ -540,6 +632,7 @@ extension TodayViewController: UITableViewDataSource {
     let row = indexPath.row
     if let title = tasks[row]?.title {
       cell.textView.text = title
+      cell.textView.textColor = UIColor.black
     } else {
       cell.setPlaceHolder()
     }
@@ -561,11 +654,9 @@ extension TodayViewController: UITableViewDataSource {
   ///   - indexPath: indexPath of cell in TableView
   private func selectionRow(isSelected: Bool, cell: UITableViewCell, indexPath: IndexPath) {
     if isSelected {
-      print("SPENCER: isCompleted loaded")
       tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
       cell.accessoryType = .checkmark
     } else {
-      print("SPENCER: NOT Completed loaded")
       tableView.deselectRow(at: indexPath, animated: true)
       cell.accessoryType = .none
     }
@@ -583,7 +674,7 @@ extension TodayViewController: UITableViewDataSource {
 }
 
 // -------------------------------------------------------------------------
-// MARK: - tableview cell delegate
+// MARK: - Tableview cell delegate
 extension TodayViewController: TableViewCellDelegate {
   func dynamicSize(cell: TableViewCell) {
     updateTableViewUI()
@@ -629,13 +720,12 @@ extension TodayViewController: TableViewCellDelegate {
       if typeCell == .task { tasks[index] = nil }
       if typeCell == .goal { goal = nil }
     } else {
-      let isCompleted = cell.accessoryType == .checkmark
-      update(focus: focus, type: typeCell, text: cell.textView.text, isCompleted: isCompleted, index: index)
+      update(focus: focus, type: typeCell, text: cell.textView.text, index: index)
       deselectGoalCell(isNewTask)
     }
+    tableView.reloadData()
     // Commit the change to context and persistent store
     try? dataController.context.save()
-    print("SPENCER: Saved into Persistent Store")
   }
   
   /// Set goal as not completed,
@@ -645,7 +735,6 @@ extension TodayViewController: TableViewCellDelegate {
   private func deselectGoalCell(_ forced: Bool) {
     if forced {
       goal?.isCompleted = false
-      tableView.reloadData()
     }
   }
 }
