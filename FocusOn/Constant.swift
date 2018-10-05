@@ -30,4 +30,7 @@ struct Constant {
   static let taskUncompleted = " more to achieve your goal"
   
   static let selectionBackgroundColor = UIColor(r: 239, g: 239, b: 244, alpha: 1)
+  
+  static let today = "Today"
+  static let dateFormat = "MMMM dd, YYYY"
 }

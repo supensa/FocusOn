@@ -73,8 +73,9 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
   }
   
   private func updateDates(_ results: [Focus]?) {
+    let date = Date()
     for result in results ?? [] {
-      result.date = Date()
+      result.date = date
     }
   }
   
@@ -241,7 +242,7 @@ extension TodayViewController {
     
     tableView.reloadData()
     
-    try? dataController.context.save()
+    saveContext()
   }
   
   /// Only remove this focus if it is a task.
@@ -264,15 +265,21 @@ extension TodayViewController {
   private func update(focus: Focus, type: Type, text: String?, index: Int) {
     focus.type = type.rawValue
     focus.title = text
-    if type == .task {
-      focus.order = Int16(index)
-    }
+    focus.order = type == .task ? Int16(index) : Int16(-1)
+    
     let date = Date()
-    // update date of all tasks and goal
     for (_,task) in tasks {
       task.date = date
     }
     goal?.date = date
+  }
+  
+  private func saveContext() {
+    do {
+      try dataController.context.save()
+    } catch {
+      fatalError("Save context failed: \(error.localizedDescription)")
+    }
   }
 }
 
@@ -362,7 +369,7 @@ extension TodayViewController: UITableViewDelegate {
       return
     }
     tableView.reloadData()
-    try? dataController.context.save()
+    saveContext()
   }
   
   // Process data when row is deselected and unchecked.
@@ -380,7 +387,7 @@ extension TodayViewController: UITableViewDelegate {
       manageTaskCellDeSelection(row: indexPath.row)
     }
     tableView.reloadData()
-    try? dataController.context.save()
+    saveContext()
   }
   
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -725,7 +732,7 @@ extension TodayViewController: TableViewCellDelegate {
     }
     tableView.reloadData()
     // Commit the change to context and persistent store
-    try? dataController.context.save()
+    saveContext()
   }
   
   /// Set goal as not completed,
