@@ -12,6 +12,8 @@
 		591A6E54216166E600D26793 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591A6E53216166E600D26793 /* TableViewCell.swift */; };
 		591A6E5821630EA000D26793 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591A6E5721630EA000D26793 /* UIColor+Extension.swift */; };
 		591A6E5A2166C97600D26793 /* HistoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591A6E592166C97600D26793 /* HistoryTableViewCell.swift */; };
+		592BEF7A2168F5FA0007FA83 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592BEF792168F5FA0007FA83 /* Test.swift */; };
+		592BEF7D216927670007FA83 /* ScrollDirectionEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592BEF7C216927670007FA83 /* ScrollDirectionEnum.swift */; };
 		5949FF232157F04C0029E984 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5949FF222157F04C0029E984 /* TabBarController.swift */; };
 		5949FF262157F97A0029E984 /* Datamodel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5949FF242157F97A0029E984 /* Datamodel.xcdatamodeld */; };
 		5949FF282157F9B20029E984 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5949FF272157F9B20029E984 /* DataController.swift */; };
@@ -36,6 +38,8 @@
 		591A6E53216166E600D26793 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		591A6E5721630EA000D26793 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		591A6E592166C97600D26793 /* HistoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTableViewCell.swift; sourceTree = "<group>"; };
+		592BEF792168F5FA0007FA83 /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
+		592BEF7C216927670007FA83 /* ScrollDirectionEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollDirectionEnum.swift; sourceTree = "<group>"; };
 		5949FF222157F04C0029E984 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		5949FF252157F97A0029E984 /* Datamodel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Datamodel.xcdatamodel; sourceTree = "<group>"; };
 		5949FF272157F9B20029E984 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
@@ -67,6 +71,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		592BEF7B216926630007FA83 /* Testing */ = {
+			isa = PBXGroup;
+			children = (
+				592BEF792168F5FA0007FA83 /* Test.swift */,
+			);
+			path = Testing;
+			sourceTree = "<group>";
+		};
 		5949FF1F2157EF590029E984 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
@@ -130,6 +142,8 @@
 				5949FF202157EF6B0029E984 /* View */,
 				5949FF1F2157EF590029E984 /* Controller */,
 				5949FF292157FB610029E984 /* Constant.swift */,
+				592BEF7C216927670007FA83 /* ScrollDirectionEnum.swift */,
+				592BEF7B216926630007FA83 /* Testing */,
 				59FDBD3A2157D38100A9AA1F /* Assets.xcassets */,
 				59FDBD3F2157D38100A9AA1F /* Info.plist */,
 			);
@@ -211,6 +225,7 @@
 				5949FF282157F9B20029E984 /* DataController.swift in Sources */,
 				591A6E54216166E600D26793 /* TableViewCell.swift in Sources */,
 				5949FF232157F04C0029E984 /* TabBarController.swift in Sources */,
+				592BEF7A2168F5FA0007FA83 /* Test.swift in Sources */,
 				59051378215BBA6C0090AB1A /* TableViewCellDelegate.swift in Sources */,
 				591A6E5821630EA000D26793 /* UIColor+Extension.swift in Sources */,
 				5949FF322158441D0029E984 /* ViewControllerProtocol.swift in Sources */,
@@ -219,6 +234,7 @@
 				5949FF2E215832D60029E984 /* ProgressViewController.swift in Sources */,
 				591A6E52215F063E00D26793 /* UIView+Extension.swift in Sources */,
 				5995E8B42158532C002762D2 /* GoalTableViewCell.swift in Sources */,
+				592BEF7D216927670007FA83 /* ScrollDirectionEnum.swift in Sources */,
 				59FDBD362157D37F00A9AA1F /* TodayViewController.swift in Sources */,
 				5949FF2C215800750029E984 /* PersistentContainer.swift in Sources */,
 				5995E8B621585339002762D2 /* TaskTableViewCell.swift in Sources */,

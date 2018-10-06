@@ -18,6 +18,8 @@ class HistoryViewController: UIViewController, ViewControllerProtocol {
   var dataController: DataController!
   var fetchedResultsController: NSFetchedResultsController<Focus>!
   
+  private var lastContentOffset: CGFloat = 0
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     tableView.delegate = self
@@ -71,8 +73,8 @@ extension HistoryViewController: UITableViewDataSource {
     let focus: Focus = fetchedResultsController.object(at: indexPath)
     
     if let cell = tableView.dequeueReusableCell(withIdentifier: "HistoryCellId") as? HistoryTableViewCell {
+      cell.label.text = focus.isCompleted ? Constant.checkmark : ""
       cell.textView.text = focus.title!
-      cell.label.text = focus.isCompleted ? Constant.checkmark + " "  : ""
       if focus.type == Type.goal.rawValue {
         cell.textView?.font = cell.textView?.font?.withSize(30)
       } else {
@@ -130,13 +132,40 @@ extension HistoryViewController: UITableViewDelegate {
 // -------------------------------------------------------------------------
 // MARK: - Scroll view delegate
 extension HistoryViewController: UIScrollViewDelegate {
-  func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-    updateDateLabel()
-    updateCompletionLabel()
+  
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    var scrollDirection = ScrollDirection.none
+    
+    if (self.lastContentOffset > scrollView.contentOffset.y) {
+      scrollDirection = .up
+    } else if (self.lastContentOffset < scrollView.contentOffset.y) {
+      scrollDirection = .down
+    }
+    
+    self.lastContentOffset = scrollView.contentOffset.y
+    
+    updateDateLabel(direction: scrollDirection)
+    updateCompletionLabel(direction: scrollDirection)
   }
   
-  private func updateCompletionLabel() {
-    let goals = getMonthlyGoals()
+  private func updateDateLabel(direction: ScrollDirection = .up) {
+    guard let date = dateFromVisibleCell(direction: direction) else { return }
+    let dateTitle = formatDateToString(date: date, format: Constant.titleDateFormat)
+    self.dateLabel.text = dateTitle
+  }
+  
+  private func dateFromVisibleCell(direction: ScrollDirection) -> Date? {
+    let potentialCell = direction == .down ? tableView.visibleCells.last : tableView.visibleCells.first
+    guard let cell = potentialCell as? HistoryTableViewCell
+      else { return nil}
+    guard let indexPath = tableView.indexPath(for: cell)
+      else { return nil }
+    let focus = fetchedResultsController.object(at: indexPath)
+    return focus.date
+  }
+  
+  private func updateCompletionLabel(direction: ScrollDirection = .up) {
+    let goals = getMonthlyGoals(direction: direction)
     let total = goals?.count ?? 0
     let completed = goals?.filter{ $0.isCompleted == true }.count ?? 0
     
@@ -144,8 +173,8 @@ extension HistoryViewController: UIScrollViewDelegate {
     completionLabel.text = sentence
   }
   
-  private func getMonthlyGoals() -> [Focus]? {
-    guard let date = dateFromFirstCellVisible() else { return nil}
+  private func getMonthlyGoals(direction: ScrollDirection) -> [Focus]? {
+    guard let date = dateFromVisibleCell(direction: direction) else { return nil}
     let month = monthString(from: date)
     let year = yearString(from: date)
     let results: [Focus]? = fetchedResultsController.fetchedObjects
@@ -166,20 +195,5 @@ extension HistoryViewController: UIScrollViewDelegate {
   
   private func yearString(from date: Date) -> String {
     return formatDateToString(date: date, format: "YYYY")
-  }
-  
-  private func updateDateLabel() {
-    guard let date = dateFromFirstCellVisible() else { return }
-    let dateTitle = formatDateToString(date: date, format: Constant.titleDateFormat)
-    self.dateLabel.text = dateTitle
-  }
-  
-  private func dateFromFirstCellVisible() -> Date? {
-    guard let cell = tableView.visibleCells.first as? HistoryTableViewCell
-      else { return nil}
-    guard let indexPath = tableView.indexPath(for: cell)
-      else { return nil }
-    let focus = fetchedResultsController.object(at: indexPath)
-    return focus.date
   }
 }

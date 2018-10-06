@@ -36,4 +36,6 @@ struct Constant {
   static let today = "Today"
   static let sectionDateFormat = "MMMM dd, YYYY"
   static let titleDateFormat = "MMMM YYYY"
+  
+  static let testDateFormat = "YYYY-MM-dd"
 }
