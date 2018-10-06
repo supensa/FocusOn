@@ -11,6 +11,7 @@ import UIKit
 class TableViewCell: UITableViewCell {
 
   weak var textView: UITextView!
+  weak var label: UILabel!
   
   var delegate: TableViewCellDelegate?
   var formerText: String?
@@ -30,6 +31,10 @@ class TableViewCell: UITableViewCell {
   
   func isPlaceHolderSet() -> Bool {
     return textView.text == placeHolderText
+  }
+  
+  func setCheckmark(_ bool: Bool) {
+    label.text = bool ? Constant.checkmark : ""
   }
   
   private func setupTextViewBorder() {
@@ -75,7 +80,7 @@ extension TableViewCell: UITextViewDelegate {
   private func clearCheckMarkIfNeeded() {
     let text = textView.text?.trimmingCharacters(in: .whitespacesAndNewlines)
     if text == "" {
-      self.accessoryType = .none
+      self.setCheckmark(false)
       self.isSelected = false
     }
   }

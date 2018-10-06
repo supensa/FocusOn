@@ -47,23 +47,37 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" translatesAutoresizingMaskIntoConstraints="NO" id="q4z-ET-Tyt">
-                                                    <rect key="frame" x="16" y="5" width="294" height="35"/>
+                                                    <rect key="frame" x="16" y="5" width="287" height="35"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                                 </textView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9Lg-EO-wVr">
+                                                    <rect key="frame" x="319" y="0.0" width="40" height="40"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="40" id="3tI-Ab-fyC"/>
+                                                        <constraint firstAttribute="width" secondItem="9Lg-EO-wVr" secondAttribute="height" multiplier="1:1" id="JhO-Pi-y8V"/>
+                                                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="40" id="SrC-F5-d5G"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstItem="9Lg-EO-wVr" firstAttribute="leading" secondItem="q4z-ET-Tyt" secondAttribute="trailing" constant="16" id="8xc-Gu-EJy"/>
                                                 <constraint firstItem="q4z-ET-Tyt" firstAttribute="leading" secondItem="Pov-ez-hff" secondAttribute="leading" constant="16" id="H5o-dO-yfL"/>
                                                 <constraint firstItem="q4z-ET-Tyt" firstAttribute="top" secondItem="Pov-ez-hff" secondAttribute="top" constant="5" id="Ia6-0I-cGJ"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="q4z-ET-Tyt" secondAttribute="trailing" constant="50" id="YD9-5N-jM2"/>
+                                                <constraint firstItem="9Lg-EO-wVr" firstAttribute="top" secondItem="Pov-ez-hff" secondAttribute="top" id="SzP-fi-lkb"/>
+                                                <constraint firstAttribute="trailing" secondItem="9Lg-EO-wVr" secondAttribute="trailing" constant="16" id="X8Q-Pj-leU"/>
                                                 <constraint firstAttribute="bottom" secondItem="q4z-ET-Tyt" secondAttribute="bottom" constant="5" id="lxU-Ky-gnJ"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
                                         <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <connections>
+                                            <outlet property="checkmarkLabel" destination="9Lg-EO-wVr" id="Wc3-9N-5cL"/>
                                             <outlet property="title" destination="q4z-ET-Tyt" id="Npz-a5-Hvt"/>
                                         </connections>
                                     </tableViewCell>
@@ -86,26 +100,40 @@
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </label>
                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZNE-2Y-rju">
-                                                    <rect key="frame" x="61" y="16" width="214" height="46"/>
+                                                    <rect key="frame" x="61" y="16" width="242" height="46"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                                 </textView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yip-D4-Swh">
+                                                    <rect key="frame" x="319" y="11" width="40" height="40"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" secondItem="yip-D4-Swh" secondAttribute="height" multiplier="1:1" id="nkw-qf-WyL"/>
+                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="40" id="qcK-Cc-SZW"/>
+                                                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="40" id="yU5-S1-ph1"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="aLK-NJ-NEN" secondAttribute="bottom" id="BH9-4U-SAw"/>
+                                                <constraint firstAttribute="trailing" secondItem="yip-D4-Swh" secondAttribute="trailing" constant="16" id="Jmi-cc-c9Y"/>
+                                                <constraint firstItem="yip-D4-Swh" firstAttribute="top" secondItem="ETw-T7-mmv" secondAttribute="topMargin" id="SNc-7t-Jah"/>
                                                 <constraint firstItem="ZNE-2Y-rju" firstAttribute="leading" secondItem="aLK-NJ-NEN" secondAttribute="trailing" constant="16" id="SvZ-F8-pQK"/>
                                                 <constraint firstAttribute="bottomMargin" secondItem="ZNE-2Y-rju" secondAttribute="bottom" id="W5b-LN-aT6"/>
-                                                <constraint firstAttribute="trailing" secondItem="ZNE-2Y-rju" secondAttribute="trailing" constant="100" id="de0-zq-ilj"/>
                                                 <constraint firstItem="aLK-NJ-NEN" firstAttribute="top" secondItem="ETw-T7-mmv" secondAttribute="top" constant="16" id="f5S-rc-ZH4"/>
                                                 <constraint firstItem="aLK-NJ-NEN" firstAttribute="leading" secondItem="ETw-T7-mmv" secondAttribute="leadingMargin" id="oAY-fY-S1B"/>
+                                                <constraint firstItem="yip-D4-Swh" firstAttribute="leading" secondItem="ZNE-2Y-rju" secondAttribute="trailing" constant="16" id="uHb-CI-GKM"/>
                                                 <constraint firstItem="ZNE-2Y-rju" firstAttribute="top" secondItem="ETw-T7-mmv" secondAttribute="topMargin" constant="5" id="ww2-xE-UKm"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
                                         <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <connections>
+                                            <outlet property="checkmarkLabel" destination="yip-D4-Swh" id="EyB-UR-RPm"/>
                                             <outlet property="numberLabel" destination="aLK-NJ-NEN" id="CGX-lF-ie5"/>
                                             <outlet property="title" destination="ZNE-2Y-rju" id="AW3-Ul-XyR"/>
                                         </connections>
@@ -249,8 +277,8 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="History" id="lFF-Sk-77o"/>
                     <connections>
-                        <outlet property="completion" destination="vkc-Lg-SSM" id="1gS-tV-Gvb"/>
-                        <outlet property="date" destination="dXe-jS-s5V" id="FHd-CG-CjY"/>
+                        <outlet property="completionLabel" destination="vkc-Lg-SSM" id="1gS-tV-Gvb"/>
+                        <outlet property="dateLabel" destination="dXe-jS-s5V" id="FHd-CG-CjY"/>
                         <outlet property="tableView" destination="OPT-wb-kIz" id="5UY-Fj-AtQ"/>
                     </connections>
                 </viewController>

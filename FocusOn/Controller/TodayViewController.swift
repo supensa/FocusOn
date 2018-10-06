@@ -207,9 +207,9 @@ extension TodayViewController {
   
   @objc private func clearButtonTapped() {
     if let textView = view.firstResponder as? UITextView {
-      let cell = textView.superview?.superview as! UITableViewCell
+      let cell = textView.superview?.superview as! TableViewCell
       cell.isSelected = false
-      cell.accessoryType = .none
+      cell.setCheckmark(false)
       textView.text = ""
       updateTableViewUI()
     }
@@ -265,7 +265,7 @@ extension TodayViewController {
   private func update(focus: Focus, type: Type, text: String?, index: Int) {
     focus.type = type.rawValue
     focus.title = text
-    focus.order = type == .task ? Int16(index) : Int16(-1)
+    if type == .task { focus.order = Int16(index) }
     
     let date = Date()
     for (_,task) in tasks {
@@ -365,7 +365,7 @@ extension TodayViewController: UITableViewDelegate {
       manageTaskCellSelection(cell, indexPath: indexPath)
     default:
       cell.isSelected = false
-      cell.accessoryType = .none
+      cell.setCheckmark(false)
       return
     }
     tableView.reloadData()
@@ -659,13 +659,13 @@ extension TodayViewController: UITableViewDataSource {
   ///   - isSelected: cell should be selected
   ///   - cell: cell to select or deselect
   ///   - indexPath: indexPath of cell in TableView
-  private func selectionRow(isSelected: Bool, cell: UITableViewCell, indexPath: IndexPath) {
+  private func selectionRow(isSelected: Bool, cell: TableViewCell, indexPath: IndexPath) {
     if isSelected {
       tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-      cell.accessoryType = .checkmark
+      cell.setCheckmark(true)
     } else {
       tableView.deselectRow(at: indexPath, animated: true)
-      cell.accessoryType = .none
+      cell.setCheckmark(false)
     }
   }
   

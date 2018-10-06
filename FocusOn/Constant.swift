@@ -19,6 +19,8 @@ struct Constant {
   static let taskCompletion = "Great job on making progress!"
   static let taskAttempt = "ah, no biggie, you’ll get it next time!"
   
+  static let checkmark = "\u{2714}"
+  
   static let taskPlaceHolder = "Define task"
   static let goalPlaceHolder = "Set your goal..."
   static let focusPlaceHolder = "Write text here"
@@ -32,5 +34,6 @@ struct Constant {
   static let selectionBackgroundColor = UIColor(r: 239, g: 239, b: 244, alpha: 1)
   
   static let today = "Today"
-  static let dateFormat = "MMMM dd, YYYY"
+  static let sectionDateFormat = "MMMM dd, YYYY"
+  static let titleDateFormat = "MMMM YYYY"
 }

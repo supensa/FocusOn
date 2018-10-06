@@ -12,9 +12,11 @@ class TaskTableViewCell: TableViewCell {
   
   @IBOutlet weak var title: UITextView!
   @IBOutlet weak var numberLabel: UILabel!
+  @IBOutlet weak var checkmarkLabel: UILabel!
   
   override func awakeFromNib() {
     self.textView = title
+    self.label = checkmarkLabel
     super.awakeFromNib()
     setupRoundLabel()
     placeHolderText = Constant.taskPlaceHolder

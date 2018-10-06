@@ -11,8 +11,8 @@ import CoreData
 
 class HistoryViewController: UIViewController, ViewControllerProtocol {
   
-  @IBOutlet weak var date: UILabel!
-  @IBOutlet weak var completion: UILabel!
+  @IBOutlet weak var dateLabel: UILabel!
+  @IBOutlet weak var completionLabel: UILabel!
   @IBOutlet weak var tableView: UITableView!
   
   var dataController: DataController!
@@ -33,13 +33,10 @@ class HistoryViewController: UIViewController, ViewControllerProtocol {
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-  }
-  
-  override func viewDidAppear(_ animated: Bool) {
-    print("SPENCER: Did appear")
-    super.viewDidAppear(animated)
     setupFetchResultsController()
     tableView.reloadData()
+    updateDateLabel()
+    updateCompletionLabel()
   }
   
   private func setupFetchResultsController() {
@@ -72,14 +69,10 @@ extension HistoryViewController: UITableViewDataSource {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     if fetchedResultsController == nil { return UITableViewCell() }
     let focus: Focus = fetchedResultsController.object(at: indexPath)
-        
-    print("SPENCER: \(String(describing: focus.title))")
-    print("SPENCER: \(String(describing: focus.date))")
-    print("SPENCER: \(String(describing: focus.order))")
     
     if let cell = tableView.dequeueReusableCell(withIdentifier: "HistoryCellId") as? HistoryTableViewCell {
       cell.textView.text = focus.title!
-      cell.label.text = focus.isCompleted ? "\u{2714} "  : ""
+      cell.label.text = focus.isCompleted ? Constant.checkmark + " "  : ""
       if focus.type == Type.goal.rawValue {
         cell.textView?.font = cell.textView?.font?.withSize(30)
       } else {
@@ -125,9 +118,68 @@ extension HistoryViewController: UITableViewDelegate {
     return today == day ? Constant.today : formatDateToString(date: day)
   }
   
-  private func formatDateToString(date: Date) -> String {
+  private func formatDateToString(date: Date, format: String = Constant.sectionDateFormat) -> String {
     let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = Constant.dateFormat
+    dateFormatter.dateFormat = format
     return dateFormatter.string(from: date)
+  }
+}
+
+
+
+// -------------------------------------------------------------------------
+// MARK: - Scroll view delegate
+extension HistoryViewController: UIScrollViewDelegate {
+  func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    updateDateLabel()
+    updateCompletionLabel()
+  }
+  
+  private func updateCompletionLabel() {
+    let goals = getMonthlyGoals()
+    let total = goals?.count ?? 0
+    let completed = goals?.filter{ $0.isCompleted == true }.count ?? 0
+    
+    let sentence = "\(completed) out of \(total) goals completed"
+    completionLabel.text = sentence
+  }
+  
+  private func getMonthlyGoals() -> [Focus]? {
+    guard let date = dateFromFirstCellVisible() else { return nil}
+    let month = monthString(from: date)
+    let year = yearString(from: date)
+    let results: [Focus]? = fetchedResultsController.fetchedObjects
+    let goals = results?.filter {
+      guard let date = $0.date else { return false }
+      guard let type = $0.type else { return false }
+      let isGoal = type == Type.goal.rawValue
+      let isSameMonth = self.monthString(from: date) == month
+      let isSameYear = self.yearString(from: date) == year
+      return isGoal && isSameMonth && isSameYear
+    }
+    return goals
+  }
+  
+  private func monthString(from date: Date) -> String {
+    return formatDateToString(date: date, format: "MMMM")
+  }
+  
+  private func yearString(from date: Date) -> String {
+    return formatDateToString(date: date, format: "YYYY")
+  }
+  
+  private func updateDateLabel() {
+    guard let date = dateFromFirstCellVisible() else { return }
+    let dateTitle = formatDateToString(date: date, format: Constant.titleDateFormat)
+    self.dateLabel.text = dateTitle
+  }
+  
+  private func dateFromFirstCellVisible() -> Date? {
+    guard let cell = tableView.visibleCells.first as? HistoryTableViewCell
+      else { return nil}
+    guard let indexPath = tableView.indexPath(for: cell)
+      else { return nil }
+    let focus = fetchedResultsController.object(at: indexPath)
+    return focus.date
   }
 }
