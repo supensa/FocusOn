@@ -24,10 +24,10 @@ class HistoryViewController: UIViewController, ViewControllerProtocol {
     super.viewDidLoad()
     tableView.delegate = self
     tableView.dataSource = self
+    setupCompletionLabelBorder()
   }
   
   override func viewDidDisappear(_ animated: Bool) {
-    print("SPENCER: disappeared")
     super.viewDidDisappear(animated)
     fetchedResultsController = nil
     tableView.reloadData()
@@ -54,6 +54,15 @@ class HistoryViewController: UIViewController, ViewControllerProtocol {
     } catch {
       fatalError("The fetchcould not performed: \(error.localizedDescription)")
     }
+  }
+  
+  private func setupCompletionLabelBorder() {
+    let bottomBorder = CALayer()
+    bottomBorder.backgroundColor = UIColor.gray.cgColor
+    bottomBorder.frame = CGRect(x: 0, y: self.completionLabel.frame.height - 1.5,
+                                width: self.completionLabel.frame.size.width,
+                                height: 1.5)
+    self.completionLabel.layer.addSublayer(bottomBorder)
   }
 }
 
@@ -134,6 +143,13 @@ extension HistoryViewController: UITableViewDelegate {
 extension HistoryViewController: UIScrollViewDelegate {
   
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    let scrollDirection = scrollingDirection(scrollView)
+    
+    updateDateLabel(direction: scrollDirection)
+    updateCompletionLabel(direction: scrollDirection)
+  }
+  
+  private func scrollingDirection(_ scrollView: UIScrollView) -> ScrollDirection {
     var scrollDirection = ScrollDirection.none
     
     if (self.lastContentOffset > scrollView.contentOffset.y) {
@@ -144,8 +160,7 @@ extension HistoryViewController: UIScrollViewDelegate {
     
     self.lastContentOffset = scrollView.contentOffset.y
     
-    updateDateLabel(direction: scrollDirection)
-    updateCompletionLabel(direction: scrollDirection)
+    return scrollDirection
   }
   
   private func updateDateLabel(direction: ScrollDirection = .up) {

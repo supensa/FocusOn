@@ -12,6 +12,7 @@ import CoreData
 class TodayViewController: UIViewController, ViewControllerProtocol {
   
   var dataController: DataController!
+  private var isFromLastDay: Bool!
   private var goal: Focus?
   private var tasks = Dictionary<Int, Focus>()
   
@@ -45,31 +46,58 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
   
   /// Retrieve a goal and its tasks
   private func requestData() {
-    // Request previous day's unachieved goal
-    let previousGoal = requestPreviousDayGoal()
-    var results: [Focus]?
+    // Request today's goal if any
+    var results = requestData(date: Date())
+    isFromLastDay = false
     
-    if let goal = previousGoal {
-      // Request previous day's unachieved goal and its tasks
-      let previousDate = goal.date!
-      results = requestData(date: previousDate)
-      // Update (tasks and goal) dates to today
-      updateDates(results)
-    } else {
-      // Request today's goal and tasks
-      results = requestData(date: Date())
+    if results.isEmpty {
+      // Request previous day's unachieved goal
+      if let goal = requestPreviousDayGoal() {
+        isFromLastDay = true
+        // Request previous day's unachieved goal and its tasks
+        let previousDate = goal.date!
+        results = requestData(date: previousDate)
+      }
     }
+    
     // Filter out the the Goal
-    goal = results?.filter { return $0.type == Type.goal.rawValue }.first
+    goal = results.filter { return $0.type == Type.goal.rawValue }.first
     // Filter out in "order" the Tasks
-    results = results?.filter { return $0.type == Type.task.rawValue }
-    for result in results ?? [] {
+    results = results.filter { return $0.type == Type.task.rawValue }
+    for result in results {
       let index: Int = Int(result.order)
       tasks[index] = result
     }
     
+    if isFromLastDay {
+      if let goal = goal { results.append(goal) }
+      askConfirmation(results: results)
+    }
+    
     print("SPENCER: \(String(describing: goal))")
     print("SPENCER: \(tasks)")
+  }
+  
+  private func askConfirmation(results: [Focus]?) {
+    let title = "Uncompleted previous goal"
+    let message = "Would you like this goal to become today's goal ?"
+    let alertController = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+    let noHandler = {
+      (action: UIAlertAction) in
+      self.goal = nil
+      self.tasks.removeAll()
+      self.tableView.reloadData()
+    }
+    let yesHandler = {
+      (action: UIAlertAction) in
+      // Update (tasks and goal) dates to today
+      self.updateDates(results)
+    }
+    let yesAction = UIAlertAction(title: "Yes", style: .default, handler: yesHandler)
+    let noAction = UIAlertAction(title: "No", style: .cancel, handler: noHandler)
+    alertController.addAction(yesAction)
+    alertController.addAction(noAction)
+    present(alertController, animated: true, completion: nil)
   }
   
   private func updateDates(_ results: [Focus]?) {
@@ -77,17 +105,23 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
     for result in results ?? [] {
       result.date = date
     }
+    saveContext()
   }
   
   /// Request a goal and its tasks for a specifice date
   ///
   /// - Parameter date: goal and tasks associated date
   /// - Returns: goal and tasks if any
-  private func requestData(date: Date) -> [Focus]? {
+  private func requestData(date: Date) -> [Focus] {
     let fetchRequest: NSFetchRequest<Focus> = Focus.fetchRequest()
     let predicate = datePredicate(date: date)
     fetchRequest.predicate = predicate
-    let results = try? dataController.context.fetch(fetchRequest)
+    var results = [Focus]()
+    do {
+      results = try dataController.context.fetch(fetchRequest)
+    } catch {
+      fatalError("Failed to fetch data: \(error.localizedDescription)")
+    }
     return results
   }
   
