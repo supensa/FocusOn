@@ -1,0 +1,35 @@
+//
+//  HistoryDataManager.swift
+//  FocusOn
+//
+//  Created by Spencer Forrest on 18/10/2018.
+//  Copyright © 2018 Spencer Forrest. All rights reserved.
+//
+
+import Foundation
+import CoreData
+
+class HistoryDataManager {
+  private let dataController: DataController!
+  
+  init(_ dataController: DataController) {
+    self.dataController = dataController
+  }
+  
+  func historyFetchResultsController() -> NSFetchedResultsController<Focus> {
+    let fetchRequest: NSFetchRequest<Focus> = Focus.fetchRequest()
+    let dateSortDescriptor = NSSortDescriptor(key: "date", ascending: false)
+    let orderSortDescriptor = NSSortDescriptor(key: "order", ascending: true)
+    fetchRequest.sortDescriptors = [dateSortDescriptor, orderSortDescriptor]
+    
+    let fetchedResultsController: NSFetchedResultsController<Focus> = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.context, sectionNameKeyPath: "date", cacheName: nil)
+    
+    do {
+      try fetchedResultsController.performFetch()
+    } catch {
+      fatalError("The fetchcould not performed: \(error.localizedDescription)")
+    }
+    
+    return fetchedResultsController
+  }
+}

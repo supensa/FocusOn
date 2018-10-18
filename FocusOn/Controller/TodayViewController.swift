@@ -12,6 +12,8 @@ import CoreData
 class TodayViewController: UIViewController, ViewControllerProtocol {
   
   var dataController: DataController!
+  private var todayDataManager: TodayDataManager!
+  
   private var isFromLastDay: Bool!
   private var goal: Focus?
   private var tasks = Dictionary<Int, Focus>()
@@ -31,6 +33,7 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
   
   override func viewDidLoad() {
     super.viewDidLoad()
+    todayDataManager = TodayDataManager(dataController)
     
     requestData()
     tableViewDelegation()
@@ -47,16 +50,16 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
   /// Retrieve a goal and its tasks
   private func requestData() {
     // Request today's goal if any
-    var results = requestData(date: Date())
+    var results: [Focus] = todayDataManager.todayFetchResultsController(date: Date()).fetchedObjects ?? []
     isFromLastDay = false
     
     if results.isEmpty {
       // Request previous day's unachieved goal
-      if let goal = requestPreviousDayGoal() {
+      if let goal = todayDataManager.requestLastUncompletedGoal() {
         isFromLastDay = true
         // Request previous day's unachieved goal and its tasks
         let previousDate = goal.date!
-        results = requestData(date: previousDate)
+        results = todayDataManager.todayFetchResultsController(date: previousDate).fetchedObjects ?? []
       }
     }
     
@@ -106,61 +109,6 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
       result.date = date
     }
     saveContext()
-  }
-  
-  /// Request a goal and its tasks for a specifice date
-  ///
-  /// - Parameter date: goal and tasks associated date
-  /// - Returns: goal and tasks if any
-  private func requestData(date: Date) -> [Focus] {
-    let fetchRequest: NSFetchRequest<Focus> = Focus.fetchRequest()
-    let predicate = datePredicate(date: date)
-    fetchRequest.predicate = predicate
-    var results = [Focus]()
-    do {
-      results = try dataController.context.fetch(fetchRequest)
-    } catch {
-      fatalError("Failed to fetch data: \(error.localizedDescription)")
-    }
-    return results
-  }
-  
-  /// Request the last unachieved Goal
-  ///
-  /// - Returns: last uncompleted goal if any
-  private func requestPreviousDayGoal() -> Focus? {
-    let fetchRequest: NSFetchRequest<Focus> = Focus.fetchRequest()
-    let sortDescriptior = NSSortDescriptor(key: "date", ascending: false)
-    let goalPredicate = NSPredicate(format: "type = %@", Type.goal.rawValue)
-    let completedPredicate = NSPredicate(format: "isCompleted = %@", NSNumber(value: false))
-    let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [goalPredicate, completedPredicate])
-    fetchRequest.sortDescriptors = [sortDescriptior]
-    fetchRequest.predicate = compoundPredicate
-    fetchRequest.fetchLimit = 1
-    let results = try? dataController.context.fetch(fetchRequest)
-    
-    return results?.first
-  }
-  
-  /// Create a predicate for a specific date
-  ///
-  /// - Parameter date: Specific date
-  /// - Returns: compound predicate
-  private func datePredicate(date: Date = Date()) -> NSCompoundPredicate {
-    // Get the current calendar with local time zone
-    var calendar = Calendar.current
-    calendar.timeZone = NSTimeZone.local
-    
-    // Get beginning & end
-    let dateFrom = calendar.startOfDay(for: date) // eg. 2016-10-10 00:00:00
-    guard let dateTo = calendar.date(byAdding: .day, value: 1, to: dateFrom)
-      else {fatalError("Date invalid")}
-    // Note: Times are printed in UTC. Depending on where you live it won't print 00:00:00 but it will work with UTC times which can be converted to local time
-    
-    // Set predicates
-    let dateFromPredicate = NSPredicate(format: "date >= %@", dateFrom as NSDate)
-    let dateToPredicate = NSPredicate(format: "date < %@", dateTo as NSDate)
-    return NSCompoundPredicate(andPredicateWithSubpredicates: [dateFromPredicate, dateToPredicate])
   }
 }
 

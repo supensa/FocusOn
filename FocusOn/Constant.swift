@@ -34,6 +34,21 @@ struct Constant {
   static let selectionBackgroundColor = UIColor(r: 239, g: 239, b: 244, alpha: 1)
   
   static let today = "Today"
-  static let sectionDateFormat = "MMMM dd, YYYY"
-  static let titleDateFormat = "MMMM YYYY"
+  static let sectionDateFormat = "MMMM dd, yyyy"
+  static let titleDateFormat = "MMMM yyyy"
+  static let defaultDateFormat = "yyyy-MM-dd HH:mm:ss"
+  static let yearDateFormat = "yyyy"
+  static let monthShortDateFormat = "MMM"
+  static let monthDateFormat = "MMM"
+  
+  static let monthlySegmentIndex = 0
+  static let weeklySegmentIndex = 1
+  
+  static func monthlyDateFormat(year: Int) -> String {
+    return "\(year)-01-01 00:00:00"
+  }
+  
+  static func weeklyDateFormat(year: Int, month: Int) -> String {
+    return "\(year)-\(month)-01 00:00:00"
+  }
 }

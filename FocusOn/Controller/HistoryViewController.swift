@@ -16,12 +16,14 @@ class HistoryViewController: UIViewController, ViewControllerProtocol {
   @IBOutlet weak var tableView: UITableView!
   
   var dataController: DataController!
+  private var historyDataManager: HistoryDataManager!
   var fetchedResultsController: NSFetchedResultsController<Focus>!
   
   private var lastContentOffset: CGFloat = 0
   
   override func viewDidLoad() {
     super.viewDidLoad()
+    historyDataManager = HistoryDataManager(dataController)
     tableView.delegate = self
     tableView.dataSource = self
     setupCompletionLabelBorder()
@@ -35,37 +37,24 @@ class HistoryViewController: UIViewController, ViewControllerProtocol {
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    setupFetchResultsController()
+    fetchedResultsController = historyDataManager.historyFetchResultsController()
     tableView.reloadData()
     updateDateLabel()
     updateCompletionLabel()
-  }
-  
-  private func setupFetchResultsController() {
-    let fetchRequest: NSFetchRequest<Focus> = Focus.fetchRequest()
-    let dateSortDescriptor = NSSortDescriptor(key: "date", ascending: false)
-    let orderSortDescriptor = NSSortDescriptor(key: "order", ascending: true)
-    fetchRequest.sortDescriptors = [dateSortDescriptor, orderSortDescriptor]
-    
-    fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.context, sectionNameKeyPath: "date", cacheName: nil)
-    
-    do {
-      try fetchedResultsController.performFetch()
-    } catch {
-      fatalError("The fetchcould not performed: \(error.localizedDescription)")
-    }
   }
   
   private func setupCompletionLabelBorder() {
     let bottomBorder = CALayer()
     bottomBorder.backgroundColor = UIColor.gray.cgColor
     bottomBorder.frame = CGRect(x: 0, y: self.completionLabel.frame.height - 1.5,
-                                width: self.completionLabel.frame.size.width,
+                                width: self.view.frame.size.width,
                                 height: 1.5)
     self.completionLabel.layer.addSublayer(bottomBorder)
   }
 }
 
+// -------------------------------------------------------------------------
+// MARK: -  TableView datasource
 extension HistoryViewController: UITableViewDataSource {
   func numberOfSections(in tableView: UITableView) -> Int {
     if fetchedResultsController == nil { return 0 }
@@ -99,6 +88,8 @@ extension HistoryViewController: UITableViewDataSource {
   }
 }
 
+// -------------------------------------------------------------------------
+// MARK: - Scroll view delegate
 extension HistoryViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
     let focus: Focus  = fetchedResultsController.sections?[section].objects?.first as! Focus
@@ -132,11 +123,10 @@ extension HistoryViewController: UITableViewDelegate {
   private func formatDateToString(date: Date, format: String = Constant.sectionDateFormat) -> String {
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = format
+    dateFormatter.timeZone = TimeZone.current
     return dateFormatter.string(from: date)
   }
 }
-
-
 
 // -------------------------------------------------------------------------
 // MARK: - Scroll view delegate
@@ -205,10 +195,10 @@ extension HistoryViewController: UIScrollViewDelegate {
   }
   
   private func monthString(from date: Date) -> String {
-    return formatDateToString(date: date, format: "MMMM")
+    return formatDateToString(date: date, format: Constant.monthDateFormat)
   }
   
   private func yearString(from date: Date) -> String {
-    return formatDateToString(date: date, format: "YYYY")
+    return formatDateToString(date: date, format: Constant.yearDateFormat)
   }
 }

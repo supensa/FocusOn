@@ -7,12 +7,177 @@
 //
 
 import UIKit
+import Charts
 
 class ProgressViewController: UIViewController, ViewControllerProtocol {
   
+  @IBOutlet weak var barChartView: HorizontalBarChartView!
+  
   var dataController: DataController!
+  private var progressDataManager: ProgressDataManager!
+  
+  var labels = [String]()
+  
+  var completedGoals = [Double]()
+  var completedTasks = [Double]()
+  
+  var goalDataSet: BarChartDataSet!
+  var taskDataSet: BarChartDataSet!
   
   override func viewDidLoad() {
     super.viewDidLoad()
+    barChartView.noDataText = "You need to provide data for this chart."
+    progressDataManager = ProgressDataManager.init(dataController)
+    let results = progressDataManager.completedFocuses(isMonthly: true)
+    let labels = progressDataManager.labels
+    self.setupData(results: results, labels: labels)
+    //    Test.shared.saveTestData(dataController: dataController)
+    
+    //legend
+    let legend = barChartView.legend
+    legend.enabled = true
+    legend.horizontalAlignment = .center
+    legend.verticalAlignment = .top
+    legend.yOffset = 10
+    legend.xOffset = 0
+    legend.orientation = .horizontal
+    legend.drawInside = true
+    
+    let xaxis = barChartView.xAxis
+    xaxis.drawGridLinesEnabled = false
+    xaxis.labelPosition = .bottom
+    xaxis.centerAxisLabelsEnabled = true
+    xaxis.valueFormatter = IndexAxisValueFormatter(values: self.labels)
+    xaxis.setLabelCount(self.labels.count, force: false)
+    
+    barChartView.drawValueAboveBarEnabled = true
+    
+    let rightAxis = barChartView.rightAxis
+    rightAxis.enabled = false
+    
+    let leftAxis = barChartView.leftAxis
+    leftAxis.axisMinimum = 0
+    leftAxis.axisMaximum = 100
+    leftAxis.drawGridLinesEnabled = true
+    
+    // Background colors
+    barChartView.backgroundColor = Constant.selectionBackgroundColor
+    barChartView.tintColor = .white
+    barChartView.drawGridBackgroundEnabled = true
+    barChartView.gridBackgroundColor = UIColor.white
+    // Disabling user interaction features
+    barChartView.scaleYEnabled = false
+    barChartView.scaleXEnabled = false
+    barChartView.pinchZoomEnabled = false
+    barChartView.doubleTapToZoomEnabled = false
+    barChartView.highlightPerTapEnabled = true
+    
+    barChartView.minOffset = 20
+    
+    setChart()
+  }
+  
+  // TODO: Update DATA LIVE
+  override func viewWillAppear(_ animated: Bool) {
+   
+  }
+  
+  @IBAction func periodChanged(_ sender: UISegmentedControl) {
+    switch sender.selectedSegmentIndex {
+    case Constant.monthlySegmentIndex:
+      print("This Year")
+      let results = progressDataManager.completedFocuses(isMonthly: true)
+      let labels = progressDataManager.labels
+      print(labels)
+      self.setupData(results: results, labels: labels)
+    case Constant.weeklySegmentIndex:
+      print("This Month")
+      let results = progressDataManager.completedFocuses(isMonthly: false)
+      let labels = progressDataManager.labels
+      print(labels)
+      self.setupData(results: results, labels: labels)
+    default: break
+    }
+    
+    let xaxis = barChartView.xAxis
+    xaxis.valueFormatter = IndexAxisValueFormatter(values: self.labels)
+    xaxis.setLabelCount(self.labels.count, force: false)
+    
+    setChart()
+  }
+  
+  func setupData(results: [String : [Double]], labels: [String]) {
+    self.labels = labels
+    self.completedGoals = [Double]()
+    self.completedTasks = [Double]()
+    for label in labels {
+      if let goalResult = results[label]?[0] {
+        self.completedGoals.append(goalResult)
+      }
+      if let taskResult = results[label]?[1] {
+        self.completedTasks.append(taskResult)
+      }
+    }
+  }
+  
+  func setChart() {
+    if completedGoals.isEmpty && completedTasks.isEmpty {
+      barChartView.data = nil
+      barChartView.notifyDataSetChanged()
+      return
+    }
+    
+    var goalDataEntries: [BarChartDataEntry] = []
+    var taskDataEntries: [BarChartDataEntry] = []
+    
+    for i in 0..<self.labels.count {
+      
+      let dataEntry = BarChartDataEntry(x: Double(i) , y: self.completedGoals[i])
+      goalDataEntries.append(dataEntry)
+      
+      let dataEntry1 = BarChartDataEntry(x: Double(i) , y: self.completedTasks[i])
+      taskDataEntries.append(dataEntry1)
+    }
+    
+    goalDataSet = BarChartDataSet(values: goalDataEntries, label: "% goals completed")
+    taskDataSet = BarChartDataSet(values: taskDataEntries, label: "% tasks completed")
+    
+    goalDataSet.colors = [UIColor.black]
+    goalDataSet.highlightColor = .clear
+    goalDataSet.drawValuesEnabled = true
+    
+    taskDataSet.colors = [UIColor.lightGray]
+    taskDataSet.highlightColor = .clear
+    taskDataSet.drawValuesEnabled = true
+    
+    let chartData = BarChartData(dataSets: [taskDataSet, goalDataSet])
+    // create a class with conformaing to IValueFormatter protocol
+    chartData.setValueFormatter(Formatter())
+    
+    let barWidth = 0.4
+    let barSpace = 0.0
+    let groupSpace = 0.2
+    
+    chartData.barWidth = barWidth
+    
+    // (0.4 + 0.00) * 2 + 0.2 = 1.00 -> interval per "group"
+    // (barWidth + barSpace) * (no.of.bars) + groupSpace = 1.00 -> interval per "group"
+    
+    let groupCount = self.labels.count
+    let startYear = 0
+    
+    barChartView.xAxis.axisMinimum = Double(startYear)
+    barChartView.xAxis.axisMaximum = Double(startYear) + Double(groupCount)
+    
+    chartData.groupBars(fromX: Double(startYear), groupSpace: groupSpace, barSpace: barSpace)
+    
+    barChartView.data = chartData
+    barChartView.notifyDataSetChanged()
+  }
+}
+
+class Formatter: IValueFormatter {
+  func stringForValue(_ value: Double, entry: ChartDataEntry, dataSetIndex: Int, viewPortHandler: ViewPortHandler?) -> String {
+    return String(format: "%.0f", value)
   }
 }
