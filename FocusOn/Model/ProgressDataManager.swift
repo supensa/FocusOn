@@ -22,10 +22,10 @@ class ProgressDataManager {
   func completedFocuses(isMonthly: Bool) -> [String:[Double]] {
     let data: [Focus] = self.progressFetchResultsController(isMonthly: isMonthly).fetchedObjects ?? []
     self.labels = [String]()
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = Constant.monthShortDateFormat
     
     if isMonthly {
+      let dateFormatter = DateFormatter()
+      dateFormatter.dateFormat = Constant.monthShortDateFormat
       let goals = self.percentageOfMonthlyCompletedFocuses(data: data, type: Type.goal.rawValue, dateFormatter: dateFormatter)
       let tasks = self.percentageOfMonthlyCompletedFocuses(data: data, type: Type.task.rawValue, dateFormatter: dateFormatter)
       let months = self.months(data)
@@ -40,7 +40,6 @@ class ProgressDataManager {
       if goals.isEmpty && tasks.isEmpty {
         return [String:[Double]]()
       } else {
-        print("NOT EMPTY MONTH")
         return self.dataStructureForWeeklyCompletedFocuses(goals: goals, tasks: tasks)
       }
     }
@@ -188,18 +187,7 @@ class ProgressDataManager {
   }
   
   private func dataStructureForWeeklyCompletedFocuses(goals: [Int:Double], tasks: [Int:Double]) -> [String:[Double]] {
-    var results = [String:[Double]]()
-    self.labels = [String]()
-    // Get number of days this month
-    let numberDays = Double(numberOfDaysIn(date: Date()))
-    let numberWeeks = Int(ceil(numberDays/7.0))
-    // Initializes all the days to [0.0]
-    for index in 1...numberWeeks {
-      let label = "Week \(index)"
-      results["\(label)"] = [0,0]
-      self.labels.append(label)
-    }
-    self.labels.reverse()
+    var results = self.initResultsAndUpdateLabels()
     // Update with the data from Goals and Tasks
     for (key,value) in goals {
       let label = "Week \(key)"
@@ -211,6 +199,22 @@ class ProgressDataManager {
       let goal = goals[key] ?? 0
       results[label] = [goal, value]
     }
+    return results
+  }
+  
+  private func initResultsAndUpdateLabels() -> [String:[Double]] {
+    self.labels = [String]()
+    // Get number of days this month
+    let numberDays = Double(numberOfDaysIn(date: Date()))
+    let numberWeeks = Int(ceil(numberDays/7.0))
+    // Initializes all the days to [0.0]
+    var results = [String:[Double]]()
+    for index in 1...numberWeeks {
+      let label = "Week \(index)"
+      results["\(label)"] = [0,0]
+      self.labels.append(label)
+    }
+    self.labels.reverse()
     return results
   }
   

@@ -12,6 +12,7 @@ import Charts
 class ProgressViewController: UIViewController, ViewControllerProtocol {
   
   @IBOutlet weak var barChartView: HorizontalBarChartView!
+  @IBOutlet weak var segmentControl: UISegmentedControl!
   
   var dataController: DataController!
   private var progressDataManager: ProgressDataManager!
@@ -28,10 +29,7 @@ class ProgressViewController: UIViewController, ViewControllerProtocol {
     super.viewDidLoad()
     barChartView.noDataText = "You need to provide data for this chart."
     progressDataManager = ProgressDataManager.init(dataController)
-    let results = progressDataManager.completedFocuses(isMonthly: true)
-    let labels = progressDataManager.labels
-    self.setupData(results: results, labels: labels)
-    //    Test.shared.saveTestData(dataController: dataController)
+//    Test.shared.saveTestData(dataController: dataController)
     
     //legend
     let legend = barChartView.legend
@@ -72,31 +70,39 @@ class ProgressViewController: UIViewController, ViewControllerProtocol {
     barChartView.doubleTapToZoomEnabled = false
     barChartView.highlightPerTapEnabled = true
     
-    barChartView.minOffset = 20
-    
-    setChart()
+    barChartView.minOffset = 30
   }
   
-  // TODO: Update DATA LIVE
   override func viewWillAppear(_ animated: Bool) {
-   
+    self.loadDataInGraph()
   }
   
-  @IBAction func periodChanged(_ sender: UISegmentedControl) {
-    switch sender.selectedSegmentIndex {
+  override func viewWillDisappear(_ animated: Bool) {
+    self.loadDataInGraph(isEmpty: true)
+  }
+  
+  @IBAction func periodChanged() {
+    self.loadDataInGraph()
+  }
+  
+  private func loadDataInGraph(isEmpty: Bool = false) {
+    let index = isEmpty ? -1 : self.segmentControl.selectedSegmentIndex
+    switch index {
     case Constant.monthlySegmentIndex:
       print("This Year")
       let results = progressDataManager.completedFocuses(isMonthly: true)
       let labels = progressDataManager.labels
-      print(labels)
-      self.setupData(results: results, labels: labels)
+      self.updateCompletedFocuses(results: results, labels: labels)
     case Constant.weeklySegmentIndex:
       print("This Month")
       let results = progressDataManager.completedFocuses(isMonthly: false)
       let labels = progressDataManager.labels
-      print(labels)
-      self.setupData(results: results, labels: labels)
-    default: break
+      self.updateCompletedFocuses(results: results, labels: labels)
+    default:
+      print("This Reset")
+      let results = [String : [Double]]()
+      let labels = [String]()
+      self.updateCompletedFocuses(results: results, labels: labels)
     }
     
     let xaxis = barChartView.xAxis
@@ -106,7 +112,7 @@ class ProgressViewController: UIViewController, ViewControllerProtocol {
     setChart()
   }
   
-  func setupData(results: [String : [Double]], labels: [String]) {
+  private func updateCompletedFocuses(results: [String : [Double]], labels: [String]) {
     self.labels = labels
     self.completedGoals = [Double]()
     self.completedTasks = [Double]()
@@ -120,13 +126,36 @@ class ProgressViewController: UIViewController, ViewControllerProtocol {
     }
   }
   
-  func setChart() {
+  private func setChart() {
     if completedGoals.isEmpty && completedTasks.isEmpty {
       barChartView.data = nil
       barChartView.notifyDataSetChanged()
       return
     }
+    updateDataSet()
+    updateBarChartData()
+    barChartView.notifyDataSetChanged()
+  }
+  
+  private func updateBarChartData() {
+    let chartData = BarChartData(dataSets: [taskDataSet, goalDataSet])
+    chartData.setValueFormatter(Formatter())
+    let barWidth = 0.4
+    let barSpace = 0.0
+    let groupSpace = 0.2
+    chartData.barWidth = barWidth
+    // (0.4 + 0.00) * 2 + 0.2 = 1.00 -> interval per "group"
+    // (barWidth + barSpace) * (no.of.bars) + groupSpace = 1.00 -> interval per "group"
+    let groupCount = self.labels.count
+    let startYear = 0
     
+    barChartView.xAxis.axisMinimum = Double(startYear)
+    barChartView.xAxis.axisMaximum = Double(startYear) + Double(groupCount)
+    chartData.groupBars(fromX: Double(startYear), groupSpace: groupSpace, barSpace: barSpace)
+    barChartView.data = chartData
+  }
+  
+  private func updateDataSet() {
     var goalDataEntries: [BarChartDataEntry] = []
     var taskDataEntries: [BarChartDataEntry] = []
     
@@ -149,35 +178,13 @@ class ProgressViewController: UIViewController, ViewControllerProtocol {
     taskDataSet.colors = [UIColor.lightGray]
     taskDataSet.highlightColor = .clear
     taskDataSet.drawValuesEnabled = true
-    
-    let chartData = BarChartData(dataSets: [taskDataSet, goalDataSet])
-    // create a class with conformaing to IValueFormatter protocol
-    chartData.setValueFormatter(Formatter())
-    
-    let barWidth = 0.4
-    let barSpace = 0.0
-    let groupSpace = 0.2
-    
-    chartData.barWidth = barWidth
-    
-    // (0.4 + 0.00) * 2 + 0.2 = 1.00 -> interval per "group"
-    // (barWidth + barSpace) * (no.of.bars) + groupSpace = 1.00 -> interval per "group"
-    
-    let groupCount = self.labels.count
-    let startYear = 0
-    
-    barChartView.xAxis.axisMinimum = Double(startYear)
-    barChartView.xAxis.axisMaximum = Double(startYear) + Double(groupCount)
-    
-    chartData.groupBars(fromX: Double(startYear), groupSpace: groupSpace, barSpace: barSpace)
-    
-    barChartView.data = chartData
-    barChartView.notifyDataSetChanged()
   }
 }
 
+/// Needed class conforming to IValueFormatter protocol.
+/// Used to round value and show it on graph if not equal to 0.0
 class Formatter: IValueFormatter {
   func stringForValue(_ value: Double, entry: ChartDataEntry, dataSetIndex: Int, viewPortHandler: ViewPortHandler?) -> String {
-    return String(format: "%.0f", value)
+    return value == 0.0 ? "" : String.init(format: "%.0f", value.rounded())
   }
 }

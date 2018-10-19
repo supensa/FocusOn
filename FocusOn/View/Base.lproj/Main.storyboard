@@ -325,7 +325,7 @@
                                         </segments>
                                         <color key="tintColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                         <connections>
-                                            <action selector="periodChanged:" destination="jfn-t3-Zjj" eventType="valueChanged" id="cQ7-bv-4PA"/>
+                                            <action selector="periodChanged" destination="jfn-t3-Zjj" eventType="valueChanged" id="e26-0Y-HT5"/>
                                         </connections>
                                     </segmentedControl>
                                 </subviews>
@@ -373,6 +373,7 @@
                     <tabBarItem key="tabBarItem" title="Progress" id="A1s-Cc-0in"/>
                     <connections>
                         <outlet property="barChartView" destination="8V5-Mf-o3r" id="plE-ay-Ew4"/>
+                        <outlet property="segmentControl" destination="Q6Y-Rr-bEo" id="HyX-V2-2ej"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4we-vo-jcH" userLabel="First Responder" sceneMemberID="firstResponder"/>
