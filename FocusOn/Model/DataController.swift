@@ -28,6 +28,14 @@ class DataController {
       }
     }
   }
+  
+  func saveContext() {
+    do {
+      try self.context.save()
+    } catch {
+      fatalError("Save context failed: \(error.localizedDescription)")
+    }
+  }
 }
 
 // -------------------------------------------------------------------------

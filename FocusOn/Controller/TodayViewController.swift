@@ -108,7 +108,7 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
     for result in results ?? [] {
       result.date = date
     }
-    saveContext()
+    dataController.saveContext()
   }
 }
 
@@ -193,13 +193,8 @@ extension TodayViewController {
       cell.isSelected = false
       cell.setCheckmark(false)
       textView.text = ""
-      updateTableViewUI()
+      tableView.updateUI()
     }
-  }
-  
-  private func trimming(textView: UITextView) {
-    textView.text = textView.text.trimmingCharacters(in: .whitespacesAndNewlines)
-    self.updateTableViewUI()
   }
 }
 
@@ -224,7 +219,7 @@ extension TodayViewController {
     
     tableView.reloadData()
     
-    saveContext()
+    dataController.saveContext()
   }
   
   /// Only remove this focus if it is a task.
@@ -254,14 +249,6 @@ extension TodayViewController {
       task.date = date
     }
     goal?.date = date
-  }
-  
-  private func saveContext() {
-    do {
-      try dataController.context.save()
-    } catch {
-      fatalError("Save context failed: \(error.localizedDescription)")
-    }
   }
 }
 
@@ -351,7 +338,7 @@ extension TodayViewController: UITableViewDelegate {
       return
     }
     tableView.reloadData()
-    saveContext()
+    dataController.saveContext()
   }
   
   // Process data when row is deselected and unchecked.
@@ -369,7 +356,7 @@ extension TodayViewController: UITableViewDelegate {
       manageTaskCellDeSelection(row: indexPath.row)
     }
     tableView.reloadData()
-    saveContext()
+    dataController.saveContext()
   }
   
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -460,17 +447,6 @@ extension TodayViewController: UITableViewDelegate {
     triggerGoalAnimation = false
   }
   
-  /// Request tableView to update its UI
-  ///
-  /// - Parameter bool: Default value is false
-  private func updateTableViewUI(withAnimation bool: Bool = false) {
-    // Request tableView to update its UI
-    UIView.setAnimationsEnabled(bool)
-    tableView.beginUpdates()
-    tableView.endUpdates()
-    UIView.setAnimationsEnabled(true)
-  }
-  
   /// Return the number of tasks without an empty title
   ///
   /// - Returns: Count of tasks
@@ -556,6 +532,11 @@ extension TodayViewController: UITableViewDelegate {
       goal?.isCompleted = true
       triggerGoalAnimation = true
     }
+  }
+  
+  private func trimming(textView: UITextView) {
+    textView.text = textView.text.trimmingCharacters(in: .whitespacesAndNewlines)
+    tableView.updateUI()
   }
 }
 
@@ -666,7 +647,7 @@ extension TodayViewController: UITableViewDataSource {
 // MARK: - Tableview cell delegate
 extension TodayViewController: TableViewCellDelegate {
   func dynamicSize(cell: TableViewCell) {
-    updateTableViewUI()
+    tableView.updateUI()
     // Keep the bottom of the cell visible on the screen
     if let indexPath = tableView.indexPath(for: cell) {
       tableView.scrollToRow(at: indexPath, at: .bottom, animated: false)
@@ -674,7 +655,7 @@ extension TodayViewController: TableViewCellDelegate {
   }
   
   func textViewDidFinishEditing(cell: TableViewCell, tag index: Int) {
-    updateTableViewUI()
+    tableView.updateUI()
     // No need to save if no changes
     guard cell.formerText != cell.textView.text else { return }
     processData(from: cell, index: index)
@@ -714,7 +695,7 @@ extension TodayViewController: TableViewCellDelegate {
     }
     tableView.reloadData()
     // Commit the change to context and persistent store
-    saveContext()
+    dataController.saveContext()
   }
   
   /// Set goal as not completed,
