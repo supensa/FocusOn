@@ -29,8 +29,6 @@ class ProgressViewController: UIViewController, ViewControllerProtocol {
     super.viewDidLoad()
     barChartView.noDataText = "You need to provide data for this chart."
     progressDataManager = ProgressDataManager.init(dataController)
-//    Test.shared.saveTestData(dataController: dataController)
-    
     //legend
     let legend = barChartView.legend
     legend.enabled = true
@@ -90,12 +88,12 @@ class ProgressViewController: UIViewController, ViewControllerProtocol {
     switch index {
     case Constant.monthlySegmentIndex:
       print("This Year")
-      let results = progressDataManager.completedFocuses(isMonthly: true)
+      let results = progressDataManager.monthlyCompletedFocuses()
       let labels = progressDataManager.labels
       self.updateCompletedFocuses(results: results, labels: labels)
     case Constant.weeklySegmentIndex:
       print("This Month")
-      let results = progressDataManager.completedFocuses(isMonthly: false)
+      let results = progressDataManager.weeklyCompletedFocuses()
       let labels = progressDataManager.labels
       self.updateCompletedFocuses(results: results, labels: labels)
     default:
@@ -130,11 +128,11 @@ class ProgressViewController: UIViewController, ViewControllerProtocol {
     if completedGoals.isEmpty && completedTasks.isEmpty {
       barChartView.data = nil
       barChartView.notifyDataSetChanged()
-      return
+    } else {
+      updateDataSet()
+      updateBarChartData()
+      barChartView.notifyDataSetChanged()
     }
-    updateDataSet()
-    updateBarChartData()
-    barChartView.notifyDataSetChanged()
   }
   
   private func updateBarChartData() {

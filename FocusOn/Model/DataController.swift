@@ -8,32 +8,48 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 class DataController {
-  private let persistentContainer: NSPersistentContainer!
+  private var persistentContainer: NSPersistentContainer!
   
   var context: NSManagedObjectContext {
     return persistentContainer.viewContext
   }
   
-  init(xcdatamodeldName name: String) {
-    persistentContainer = PersistentContainer(name: name)
+  init(xcdatamodeldName name: String,
+       managedObjectModel: NSManagedObjectModel? = nil,
+       persistentStoreDescription: NSPersistentStoreDescription? = nil ) {
+    if let managedObjectModel = managedObjectModel {
+      persistentContainer = PersistentContainer.init(name: name, managedObjectModel: managedObjectModel)
+    } else {
+      persistentContainer = PersistentContainer.init(name: name)
+    }
+    let nsPersistentStoreDescription = NSPersistentStoreDescription()
+    if let storeDescription = persistentStoreDescription {
+      nsPersistentStoreDescription.type = storeDescription.type
+    } else {
+      nsPersistentStoreDescription.type = NSSQLiteStoreType
+    }
+    persistentContainer.persistentStoreDescriptions = [nsPersistentStoreDescription]
   }
   
   func load() {
     persistentContainer.loadPersistentStores {
       (description, error) in
-      if let error = error {
-        fatalError("Unable to load persistent stores: \(error)")
+      if let error = error as NSError? {
+        fatalError("Unresolved error \(error), \(error.userInfo)")
       }
     }
   }
   
-  func saveContext() {
-    do {
-      try self.context.save()
-    } catch {
-      fatalError("Save context failed: \(error.localizedDescription)")
+  deinit {
+    persistentContainer = nil
+  }
+  
+  func saveContext() throws {
+    if context.hasChanges {
+      return try self.context.save()
     }
   }
 }
@@ -50,16 +66,14 @@ extension DataController {
     var calendar = Calendar.current
     calendar.timeZone = TimeZone.current
     
-    // Get beginning & end
+    // Get beginning and end
     let dateFrom = calendar.startOfDay(for: date) // eg. 2018-10-10 00:00:00 (for current Time zone but different for UTC +0000)
-    
-    guard let dateTo = endDate == nil ? calendar.date(byAdding: .day, value: 1, to: dateFrom) : endDate
-      else {fatalError("Date invalid")}
+    let endDate = endDate == nil ? calendar.date(byAdding: .day, value: 1, to: dateFrom) : endDate
+    var dateTo = dateFrom
+    if let date = endDate {
+      dateTo = date
+    }
     // Note: Times are printed in UTC. UTC times can be converted to local time
-    
-    print("\nDateFrom: \(dateFrom)")
-    print("DateTo: \(dateTo)\n")
-    
     // Set predicates
     let dateFromPredicate = NSPredicate(format: "date >= %@", dateFrom as NSDate)
     let dateToPredicate = NSPredicate(format: "date < %@", dateTo as NSDate)

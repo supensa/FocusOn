@@ -19,30 +19,37 @@ class ProgressDataManager {
     self.dataController = dataController
   }
   
-  func completedFocuses(isMonthly: Bool) -> [String:[Double]] {
-    let data: [Focus] = self.progressFetchResultsController(isMonthly: isMonthly).fetchedObjects ?? []
-    self.labels = [String]()
-    
-    if isMonthly {
-      let dateFormatter = DateFormatter()
-      dateFormatter.dateFormat = Constant.monthShortDateFormat
-      let goals = self.percentageOfMonthlyCompletedFocuses(data: data, type: Type.goal.rawValue, dateFormatter: dateFormatter)
-      let tasks = self.percentageOfMonthlyCompletedFocuses(data: data, type: Type.task.rawValue, dateFormatter: dateFormatter)
-      let months = self.months(data)
-      if goals.isEmpty && tasks.isEmpty {
-        return [String:[Double]]()
-      } else {
-        return self.dataStructureForMonthlyCompletedFocuses(months: months, goals: goals, tasks: tasks)
-      }
-    } else {
-      let goals = self.percentageOfWeeklyCompletedFocuses(data: data, type: Type.goal.rawValue)
-      let tasks = self.percentageOfWeeklyCompletedFocuses(data: data, type: Type.task.rawValue)
-      if goals.isEmpty && tasks.isEmpty {
-        return [String:[Double]]()
-      } else {
-        return self.dataStructureForWeeklyCompletedFocuses(goals: goals, tasks: tasks)
-      }
+  func monthlyCompletedFocuses() -> [String:[Double]] {
+    var dataStructure = [String:[Double]]()
+    var data = [Focus]()
+    if let results = self.progressFetchResultsController(isMonthly: true).fetchedObjects {
+      data = results
     }
+    self.labels = [String]()
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = Constant.monthShortDateFormat
+    let goals = self.percentageOfMonthlyCompletedFocuses(data: data, type: Type.goal.rawValue, dateFormatter: dateFormatter)
+    let tasks = self.percentageOfMonthlyCompletedFocuses(data: data, type: Type.task.rawValue, dateFormatter: dateFormatter)
+    let months = self.months(data)
+    if !goals.isEmpty || !tasks.isEmpty {
+      dataStructure = self.dataStructureForMonthlyCompletedFocuses(months: months, goals: goals, tasks: tasks)
+    }
+    return dataStructure
+  }
+  
+  func weeklyCompletedFocuses() -> [String:[Double]] {
+    var dataStructure = [String:[Double]]()
+    var data = [Focus]()
+    if let results = self.progressFetchResultsController(isMonthly: false).fetchedObjects {
+      data = results
+    }
+    self.labels = [String]()
+    let goals = self.percentageOfWeeklyCompletedFocuses(data: data, type: Type.goal.rawValue)
+    let tasks = self.percentageOfWeeklyCompletedFocuses(data: data, type: Type.task.rawValue)
+    if !goals.isEmpty || !tasks.isEmpty {
+      dataStructure = self.dataStructureForWeeklyCompletedFocuses(goals: goals, tasks: tasks)
+    }
+    return dataStructure
   }
   
   private func progressFetchResultsController(isMonthly: Bool) -> NSFetchedResultsController<Focus> {
@@ -52,15 +59,12 @@ class ProgressDataManager {
     let dates = self.period(isMonthly: isMonthly)
     let predicate = dataController.datePredicate(from: dates.0, to: dates.1)
     fetchRequest.predicate = predicate
-    
-    let fetchedResultsController: NSFetchedResultsController<Focus> = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.context, sectionNameKeyPath: "date", cacheName: nil)
-    
-    do {
-      try fetchedResultsController.performFetch()
-    } catch {
-      fatalError("The fetchcould not performed: \(error.localizedDescription)")
-    }
-    
+    let fetchedResultsController =
+      NSFetchedResultsController(fetchRequest: fetchRequest,
+                                 managedObjectContext: dataController.context,
+                                 sectionNameKeyPath: "date",
+                                 cacheName: nil)
+    try? fetchedResultsController.performFetch()
     return fetchedResultsController
   }
   
@@ -111,12 +115,15 @@ class ProgressDataManager {
   private func months(_ focuses: [Focus]?) -> [String] {
     var months = [String]()
     var lastMonth = ""
-    let data = focuses
+    var data = [Focus]()
+    if let focuses = focuses {
+      data = focuses
+    }
     
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = Constant.monthShortDateFormat
     
-    for focus in data ?? [] {
+    for focus in data {
       let month = dateFormatter.string(from: focus.date!)
       if month != lastMonth {
         months.append(month)

@@ -12,13 +12,14 @@ import CoreData
 class PersistentContainer: NSPersistentContainer {
   
   override class func defaultDirectoryURL() -> URL {
+    var directoryURL = super.defaultDirectoryURL()
     if let libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).last {
       let persistentStoreURL = libraryURL.appendingPathComponent(Constant.persistentStorePath, isDirectory: true)
       // Create "Persistent Store" folder in "Library/Application Support"
       createFolderIfNeeded(for: persistentStoreURL)
-      return persistentStoreURL
+      directoryURL = persistentStoreURL
     }
-    return super.defaultDirectoryURL()
+    return directoryURL
   }
   
   private static func createFolderIfNeeded(for url: URL) {

@@ -23,13 +23,7 @@ class HistoryDataManager {
     fetchRequest.sortDescriptors = [dateSortDescriptor, orderSortDescriptor]
     
     let fetchedResultsController: NSFetchedResultsController<Focus> = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.context, sectionNameKeyPath: "date", cacheName: nil)
-    
-    do {
-      try fetchedResultsController.performFetch()
-    } catch {
-      fatalError("The fetchcould not performed: \(error.localizedDescription)")
-    }
-    
+    try? fetchedResultsController.performFetch()
     return fetchedResultsController
   }
 }

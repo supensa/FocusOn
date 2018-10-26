@@ -20,27 +20,21 @@ class TodayDataManager {
   ///
   /// - Parameter date: goal and tasks associated date
   /// - Returns: goal and tasks if any
-  func todayFetchResultsController(date: Date) -> NSFetchedResultsController<Focus> {
+  func fetchResultsController(date: Date, errorHandler: (()->())? = nil) -> NSFetchedResultsController<Focus> {
     let fetchRequest: NSFetchRequest<Focus> = Focus.fetchRequest()
     let typeSortDescriptor = NSSortDescriptor(key: "type", ascending: false)
     fetchRequest.sortDescriptors = [typeSortDescriptor]
     let predicate = dataController.datePredicate(from: date)
     fetchRequest.predicate = predicate
-    
     let fetchedResultsController: NSFetchedResultsController<Focus> = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.context, sectionNameKeyPath: nil, cacheName: nil)
-    
-    do {
-      try fetchedResultsController.performFetch()
-    } catch {
-      fatalError("Failed to fetch data: \(error.localizedDescription)")
-    }
+    try? fetchedResultsController.performFetch()
     return fetchedResultsController
   }
   
   /// Request the last unachieved Goal
   ///
   /// - Returns: last uncompleted goal if any
-  func requestLastUncompletedGoal() -> Focus? {
+  func requestLastUncompletedGoal(errorHandler: (()->())? = nil) -> Focus? {
     let fetchRequest: NSFetchRequest<Focus> = Focus.fetchRequest()
     let sortDescriptior = NSSortDescriptor(key: "date", ascending: false)
     let goalPredicate = NSPredicate(format: "type = %@", Type.goal.rawValue)
@@ -49,8 +43,10 @@ class TodayDataManager {
     fetchRequest.sortDescriptors = [sortDescriptior]
     fetchRequest.predicate = compoundPredicate
     fetchRequest.fetchLimit = 1
-    let results = try? dataController.context.fetch(fetchRequest)
-    
-    return results?.first
+    var results = [Focus]()
+    if let objects = try? dataController.context.fetch(fetchRequest) {
+      results = objects
+    }
+    return results.first
   }
 }

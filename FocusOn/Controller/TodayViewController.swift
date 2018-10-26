@@ -50,7 +50,7 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
   /// Retrieve a goal and its tasks
   private func requestData() {
     // Request today's goal if any
-    var results: [Focus] = todayDataManager.todayFetchResultsController(date: Date()).fetchedObjects ?? []
+    var results: [Focus] = todayDataManager.fetchResultsController(date: Date()).fetchedObjects ?? []
     isFromLastDay = false
     
     if results.isEmpty {
@@ -59,7 +59,7 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
         isFromLastDay = true
         // Request previous day's unachieved goal and its tasks
         let previousDate = goal.date!
-        results = todayDataManager.todayFetchResultsController(date: previousDate).fetchedObjects ?? []
+        results = todayDataManager.fetchResultsController(date: previousDate).fetchedObjects ?? []
       }
     }
     
@@ -76,9 +76,6 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
       if let goal = goal { results.append(goal) }
       askConfirmation(results: results)
     }
-    
-    print("SPENCER: \(String(describing: goal))")
-    print("SPENCER: \(tasks)")
   }
   
   private func askConfirmation(results: [Focus]?) {
@@ -108,7 +105,23 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
     for result in results ?? [] {
       result.date = date
     }
-    dataController.saveContext()
+    
+    do {
+      try dataController.saveContext()
+    } catch {
+      let alertController = self.showErrorToUser()
+      self.present(alertController, animated: true, completion: nil)
+    }
+  }
+  
+  private func showErrorToUser() -> UIAlertController {
+    let message =  Constant.contextSavingErrorMessage
+    let alertController = UIAlertController(title: Constant.contextSavingErrorTitle,
+                                            message: message,
+                                            preferredStyle: .alert)
+    let actionOk = UIAlertAction(title: "Got it", style: .default)
+    alertController.addAction(actionOk)
+    return alertController
   }
 }
 
@@ -219,7 +232,12 @@ extension TodayViewController {
     
     tableView.reloadData()
     
-    dataController.saveContext()
+    do {
+      try dataController.saveContext()
+    } catch {
+      let alertController = self.showErrorToUser()
+      self.present(alertController, animated: true, completion: nil)
+    }
   }
   
   /// Only remove this focus if it is a task.
@@ -338,7 +356,12 @@ extension TodayViewController: UITableViewDelegate {
       return
     }
     tableView.reloadData()
-    dataController.saveContext()
+    do {
+      try dataController.saveContext()
+    } catch {
+      let alertController = self.showErrorToUser()
+      self.present(alertController, animated: true, completion: nil)
+    }
   }
   
   // Process data when row is deselected and unchecked.
@@ -356,7 +379,12 @@ extension TodayViewController: UITableViewDelegate {
       manageTaskCellDeSelection(row: indexPath.row)
     }
     tableView.reloadData()
-    dataController.saveContext()
+    do {
+      try dataController.saveContext()
+    } catch {
+      let alertController = self.showErrorToUser()
+      self.present(alertController, animated: true, completion: nil)
+    }
   }
   
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -695,7 +723,12 @@ extension TodayViewController: TableViewCellDelegate {
     }
     tableView.reloadData()
     // Commit the change to context and persistent store
-    dataController.saveContext()
+    do {
+      try dataController.saveContext()
+    } catch {
+      let alertController = self.showErrorToUser()
+      self.present(alertController, animated: true, completion: nil)
+    }
   }
   
   /// Set goal as not completed,
