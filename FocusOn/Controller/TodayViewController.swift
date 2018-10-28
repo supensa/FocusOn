@@ -485,6 +485,9 @@ extension TodayViewController: UITableViewDelegate {
       }.count
   }
   
+  /// Return the number of completed tasks
+  ///
+  /// - Returns: Count of completed tasks
   private func countCompletedTasks() -> Int {
     return tasks.filter {
       let result = $1.isCompleted

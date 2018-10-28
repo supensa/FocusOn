@@ -87,17 +87,14 @@ class ProgressViewController: UIViewController, ViewControllerProtocol {
     let index = isEmpty ? -1 : self.segmentControl.selectedSegmentIndex
     switch index {
     case Constant.monthlySegmentIndex:
-      print("This Year")
       let results = progressDataManager.monthlyCompletedFocuses()
       let labels = progressDataManager.labels
       self.updateCompletedFocuses(results: results, labels: labels)
     case Constant.weeklySegmentIndex:
-      print("This Month")
       let results = progressDataManager.weeklyCompletedFocuses()
       let labels = progressDataManager.labels
       self.updateCompletedFocuses(results: results, labels: labels)
     default:
-      print("This Reset")
       let results = [String : [Double]]()
       let labels = [String]()
       self.updateCompletedFocuses(results: results, labels: labels)

@@ -69,7 +69,8 @@ class ProgressDataManager {
   }
   
   private func percentageOfMonthlyCompletedFocuses(data: [Focus], type: String, dateFormatter: DateFormatter) -> [Double] {
-    var lastMonth = data.first == nil ? "" : dateFormatter.string(from: (data.first?.date)!)
+    var lastMonth = ""
+    if let data = data.first { lastMonth = dateFormatter.string(from: (data.date)!) }
     var total = 0
     var count = 0
     
@@ -137,7 +138,7 @@ class ProgressDataManager {
     // Get today's Year and Month
     let today = Date()
     var calendar = Calendar.current
-    calendar.timeZone = TimeZone.init(identifier: "UTC")!
+    calendar.timeZone = TimeZone(secondsFromGMT: 0)!
     let month = calendar.component(.month, from: today)
     let year = calendar.component(.year, from: today)
     // Begining and End date represented as string
@@ -147,17 +148,24 @@ class ProgressDataManager {
     dateFormatter.dateFormat = Constant.defaultDateFormat
     dateFormatter.timeZone = TimeZone.current
     // Get 2 Dates from strings
-    guard let start = dateFormatter.date(from: startTime)
-      else { fatalError("Date representing the beginning cannot be created") }
-    guard let end = dateFormatter.date(from: endTime)
-      else { fatalError("Date representing the end cannot be created") }
+    var start = Date()
+    var end = Date()
+    if let date = dateFormatter.date(from: startTime) {
+      start = date
+    }
+    if let date = dateFormatter.date(from: endTime) {
+      end = date
+    }
     // return 2 Dates as tuples
     return (start, end)
   }
   
   private func percentageOfWeeklyCompletedFocuses(data: [Focus], type: String) -> [Int:Double] {
-    var focuses = [Int:Double]()
-    var lastWeek = data.isEmpty ? 0 : weekComponent(date: (data.first?.date)!)
+    var focuses: [Int:Double] = [:]
+    var lastWeek = 0
+    if !data.isEmpty {
+      lastWeek = weekComponent(date: (data.first?.date)!)
+    }
     var count = 0
     var total = 0
     for index in 0..<data.count {
@@ -184,7 +192,9 @@ class ProgressDataManager {
   }
   
   private func percentage(count: Int, total: Int) -> Double {
-    return total == 0 ? 0.0 : Double(count) * 100 / Double(total)
+    var result = 0.0
+    if total != 0 { result = Double(count) * 100 / Double(total) }
+    return result
   }
   
   private func weekComponent(date: Date) -> Int {
@@ -198,12 +208,14 @@ class ProgressDataManager {
     // Update with the data from Goals and Tasks
     for (key,value) in goals {
       let label = "Week \(key)"
-      let task = tasks[key] ?? 0
+      var task = 0.0
+      if let result = tasks[key] { task = result }
       results[label] = [value, task]
     }
     for (key,value) in tasks {
       let label = "Week \(key)"
-      let goal = goals[key] ?? 0
+      var goal = 0.0
+      if let result = goals[key] { goal = result }
       results[label] = [goal, value]
     }
     return results

@@ -154,7 +154,10 @@ extension HistoryViewController: UIScrollViewDelegate {
   }
   
   private func updateDateLabel(direction: ScrollDirection = .up) {
-    guard let date = dateFromVisibleCell(direction: direction) else { return }
+    guard let date = dateFromVisibleCell(direction: direction) else {
+      self.dateLabel.text = "No data saved so far"
+      return
+    }
     let dateTitle = formatDateToString(date: date, format: Constant.titleDateFormat)
     self.dateLabel.text = dateTitle
   }

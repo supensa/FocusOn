@@ -11,6 +11,12 @@ import CoreData
 import UIKit
 
 class DataController {
+  // When 'DataController' is initialized in AppDelegate
+  // then "static var model" updates to current NSManagedOjectModel.
+  // This is needed for Unit Testing 'DataController'
+  // since we need to use the same NSManagedObjectModel in memory.
+  static var model: NSManagedObjectModel = NSManagedObjectModel()
+  
   private var persistentContainer: NSPersistentContainer!
   
   var context: NSManagedObjectContext {
@@ -32,8 +38,10 @@ class DataController {
       nsPersistentStoreDescription.type = NSSQLiteStoreType
     }
     persistentContainer.persistentStoreDescriptions = [nsPersistentStoreDescription]
+    // Update "static var model"
+    DataController.model = persistentContainer.managedObjectModel
   }
-  
+    
   func load() {
     persistentContainer.loadPersistentStores {
       (description, error) in
@@ -42,11 +50,7 @@ class DataController {
       }
     }
   }
-  
-  deinit {
-    persistentContainer = nil
-  }
-  
+    
   func saveContext() throws {
     if context.hasChanges {
       return try self.context.save()

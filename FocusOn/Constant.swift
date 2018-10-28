@@ -10,8 +10,12 @@ import UIKit
 
 struct Constant {
   static let datamodelName = "Datamodel"
-  static let managedObjectModelDocument = "momd"
   static let persistentStorePath = "Application Support/Persistent Store"
+  
+  static let contextSavingErrorMessage = "There was a problem saving your data but it is not your fault."
+    + "If you restart the app, you can try again."
+    + "Please contact support to notify us of this issue:\n"
+  static let contextSavingErrorTitle = "Could Not Save Data"
   
   static let goalCellId = "GoalCellId"
   static let taskCellId = "TaskCellId"

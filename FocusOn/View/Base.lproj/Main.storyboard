@@ -157,7 +157,7 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Today" id="8CN-ky-w0n"/>
+                    <tabBarItem key="tabBarItem" title="Today" image="check" id="8CN-ky-w0n"/>
                     <connections>
                         <outlet property="tableView" destination="5io-gG-hPa" id="iJy-Yb-fC4"/>
                     </connections>
@@ -279,7 +279,7 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="H5K-58-Kao"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="History" id="lFF-Sk-77o"/>
+                    <tabBarItem key="tabBarItem" title="History" image="list" id="lFF-Sk-77o"/>
                     <connections>
                         <outlet property="completionLabel" destination="vkc-Lg-SSM" id="1gS-tV-Gvb"/>
                         <outlet property="dateLabel" destination="dXe-jS-s5V" id="FHd-CG-CjY"/>
@@ -370,7 +370,7 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="3E4-FO-vNb"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Progress" id="A1s-Cc-0in"/>
+                    <tabBarItem key="tabBarItem" title="Progress" image="chart" id="A1s-Cc-0in"/>
                     <connections>
                         <outlet property="barChartView" destination="8V5-Mf-o3r" id="plE-ay-Ew4"/>
                         <outlet property="segmentControl" destination="Q6Y-Rr-bEo" id="HyX-V2-2ej"/>
@@ -401,4 +401,9 @@
             <point key="canvasLocation" x="136.80000000000001" y="133.5832083958021"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="chart" width="60" height="60"/>
+        <image name="check" width="60" height="60"/>
+        <image name="list" width="60" height="60"/>
+    </resources>
 </document>

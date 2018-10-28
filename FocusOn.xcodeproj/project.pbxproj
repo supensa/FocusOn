@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		59001CA12185E22700CDFAF8 /* DummyDataGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59001CA02185E22700CDFAF8 /* DummyDataGenerator.swift */; };
 		59051378215BBA6C0090AB1A /* TableViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59051377215BBA6C0090AB1A /* TableViewCellDelegate.swift */; };
 		591A6E52215F063E00D26793 /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591A6E51215F063E00D26793 /* UIView+Extension.swift */; };
 		591A6E54216166E600D26793 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591A6E53216166E600D26793 /* TableViewCell.swift */; };
@@ -25,7 +26,6 @@
 		59709D74216D3E9900575226 /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 59709D70216D3E8700575226 /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5995E8B42158532C002762D2 /* GoalTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5995E8B32158532C002762D2 /* GoalTableViewCell.swift */; };
 		5995E8B621585339002762D2 /* TaskTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5995E8B521585339002762D2 /* TaskTableViewCell.swift */; };
-		59BBC2422183D0B9009CD997 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592BEF792168F5FA0007FA83 /* Test.swift */; };
 		59C4114D2159382E00FEB9D2 /* TypeEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C4114C2159382E00FEB9D2 /* TypeEnum.swift */; };
 		59C715D62178E74900308279 /* Calendar+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C715D52178E74900308279 /* Calendar+Extension.swift */; };
 		59C715D82178E85100308279 /* TodayDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C715D72178E85100308279 /* TodayDataManager.swift */; };
@@ -86,12 +86,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		59001CA02185E22700CDFAF8 /* DummyDataGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DummyDataGenerator.swift; sourceTree = "<group>"; };
 		59051377215BBA6C0090AB1A /* TableViewCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCellDelegate.swift; sourceTree = "<group>"; };
 		591A6E51215F063E00D26793 /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
 		591A6E53216166E600D26793 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		591A6E5721630EA000D26793 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		591A6E592166C97600D26793 /* HistoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTableViewCell.swift; sourceTree = "<group>"; };
-		592BEF792168F5FA0007FA83 /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 		592BEF7C216927670007FA83 /* ScrollDirectionEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollDirectionEnum.swift; sourceTree = "<group>"; };
 		5949FF222157F04C0029E984 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		5949FF252157F97A0029E984 /* Datamodel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Datamodel.xcdatamodel; sourceTree = "<group>"; };
@@ -141,6 +141,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		59001C9E2185E1EB00CDFAF8 /* DummyData */ = {
+			isa = PBXGroup;
+			children = (
+				59001CA02185E22700CDFAF8 /* DummyDataGenerator.swift */,
+			);
+			path = DummyData;
+			sourceTree = "<group>";
+		};
 		5949FF1F2157EF590029E984 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
@@ -234,6 +242,7 @@
 		59FDBD322157D37F00A9AA1F /* FocusOn */ = {
 			isa = PBXGroup;
 			children = (
+				59001C9E2185E1EB00CDFAF8 /* DummyData */,
 				5949FF212157EF720029E984 /* Model */,
 				5949FF202157EF6B0029E984 /* View */,
 				5949FF1F2157EF590029E984 /* Controller */,
@@ -241,7 +250,6 @@
 				592BEF7C216927670007FA83 /* ScrollDirectionEnum.swift */,
 				59FDBD3A2157D38100A9AA1F /* Assets.xcassets */,
 				59FDBD3F2157D38100A9AA1F /* Info.plist */,
-				592BEF792168F5FA0007FA83 /* Test.swift */,
 			);
 			path = FocusOn;
 			sourceTree = "<group>";
@@ -383,6 +391,7 @@
 				591A6E5A2166C97600D26793 /* HistoryTableViewCell.swift in Sources */,
 				5949FF282157F9B20029E984 /* DataController.swift in Sources */,
 				591A6E54216166E600D26793 /* TableViewCell.swift in Sources */,
+				59001CA12185E22700CDFAF8 /* DummyDataGenerator.swift in Sources */,
 				5949FF232157F04C0029E984 /* TabBarController.swift in Sources */,
 				59051378215BBA6C0090AB1A /* TableViewCellDelegate.swift in Sources */,
 				591A6E5821630EA000D26793 /* UIColor+Extension.swift in Sources */,
@@ -402,7 +411,6 @@
 				5995E8B621585339002762D2 /* TaskTableViewCell.swift in Sources */,
 				5949FF30215832F20029E984 /* HistoryViewController.swift in Sources */,
 				59C715EE217AADFE00308279 /* UITableView+Extension.swift in Sources */,
-				59BBC2422183D0B9009CD997 /* Test.swift in Sources */,
 				59FDBD342157D37F00A9AA1F /* AppDelegate.swift in Sources */,
 				5949FF2A2157FB610029E984 /* Constant.swift in Sources */,
 			);
