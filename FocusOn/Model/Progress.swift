@@ -1,5 +1,5 @@
 //
-//  ProgressDataManager.swift
+//  Progress.swift
 //  FocusOn
 //
 //  Created by Spencer Forrest on 16/10/2018.
@@ -9,23 +9,46 @@
 import Foundation
 import CoreData
 
-class ProgressDataManager {
-  
+class Progress {
+  var labels: [String] {
+    return _labels
+  }
+  private var _labels = [String]()
   private let dataController: DataController!
-  
-  var labels = [String]()
   
   init(_ dataController: DataController) {
     self.dataController = dataController
   }
   
-  func monthlyCompletedFocuses() -> [String:[Double]] {
+  /**
+   Return percentages of completed Focuses.
+   * First array for the Goals.
+   * Second array for the Tasks
+   - Parameter isWeekly: Weekly or monthly report
+   - Returns: A tuple
+   */
+  func completedFocuses(isWeekly: Bool) -> ([Double],[Double]) {
+    let results = isWeekly ? weeklyCompletedFocuses() : monthlyCompletedFocuses()
+    var completedTasks = [Double]()
+    var completedGoals = [Double]()
+    for label in _labels {
+      if let goalResult = results[label]?[0] {
+        completedGoals.append(goalResult)
+      }
+      if let taskResult = results[label]?[1] {
+        completedTasks.append(taskResult)
+      }
+    }
+    return (completedGoals, completedTasks)
+  }
+  
+  private func monthlyCompletedFocuses() -> [String:[Double]] {
     var dataStructure = [String:[Double]]()
     var data = [Focus]()
     if let results = self.progressFetchResultsController(isMonthly: true).fetchedObjects {
       data = results
     }
-    self.labels = [String]()
+    self._labels = [String]()
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = Constant.monthShortDateFormat
     let goals = self.percentageOfMonthlyCompletedFocuses(data: data, type: Type.goal.rawValue, dateFormatter: dateFormatter)
@@ -37,13 +60,13 @@ class ProgressDataManager {
     return dataStructure
   }
   
-  func weeklyCompletedFocuses() -> [String:[Double]] {
+  private func weeklyCompletedFocuses() -> [String:[Double]] {
     var dataStructure = [String:[Double]]()
     var data = [Focus]()
     if let results = self.progressFetchResultsController(isMonthly: false).fetchedObjects {
       data = results
     }
-    self.labels = [String]()
+    self._labels = [String]()
     let goals = self.percentageOfWeeklyCompletedFocuses(data: data, type: Type.goal.rawValue)
     let tasks = self.percentageOfWeeklyCompletedFocuses(data: data, type: Type.task.rawValue)
     if !goals.isEmpty || !tasks.isEmpty {
@@ -100,8 +123,8 @@ class ProgressDataManager {
   
   private func dataStructureForMonthlyCompletedFocuses(months: [String], goals: [Double], tasks: [Double]) -> [String:[Double]] {
     var results = [String:[Double]]()
-    labels = Calendar.current.shortMonthSymbols.reversed()
-    for labels in labels {
+    _labels = Calendar.current.shortMonthSymbols.reversed()
+    for labels in _labels {
       results[labels] = [0,0]
     }
     for index in 0..<months.count {
@@ -200,7 +223,8 @@ class ProgressDataManager {
   private func weekComponent(date: Date) -> Int {
     var calendar = Calendar.current
     calendar.timeZone = TimeZone.current
-    return calendar.weekComponent(date: date)
+    let day = Double(calendar.component(.day, from: date))
+    return Int(ceil(day/7.0))
   }
   
   private func dataStructureForWeeklyCompletedFocuses(goals: [Int:Double], tasks: [Int:Double]) -> [String:[Double]] {
@@ -222,7 +246,7 @@ class ProgressDataManager {
   }
   
   private func initResultsAndUpdateLabels() -> [String:[Double]] {
-    self.labels = [String]()
+    self._labels = [String]()
     // Get number of days this month
     let numberDays = Double(numberOfDaysIn(date: Date()))
     let numberWeeks = Int(ceil(numberDays/7.0))
@@ -231,9 +255,9 @@ class ProgressDataManager {
     for index in 1...numberWeeks {
       let label = "Week \(index)"
       results["\(label)"] = [0,0]
-      self.labels.append(label)
+      self._labels.append(label)
     }
-    self.labels.reverse()
+    self._labels.reverse()
     return results
   }
   

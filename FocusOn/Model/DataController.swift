@@ -31,17 +31,15 @@ class DataController {
     } else {
       persistentContainer = PersistentContainer.init(name: name)
     }
-    let nsPersistentStoreDescription = NSPersistentStoreDescription()
     if let storeDescription = persistentStoreDescription {
-      nsPersistentStoreDescription.type = storeDescription.type
-    } else {
-      nsPersistentStoreDescription.type = NSSQLiteStoreType
+       let persistentStoreDescription = NSPersistentStoreDescription()
+      persistentStoreDescription.type = storeDescription.type
+      persistentContainer.persistentStoreDescriptions = [persistentStoreDescription]
     }
-    persistentContainer.persistentStoreDescriptions = [nsPersistentStoreDescription]
     // Update "static var model"
     DataController.model = persistentContainer.managedObjectModel
   }
-    
+  
   func load() {
     persistentContainer.loadPersistentStores {
       (description, error) in
@@ -50,7 +48,7 @@ class DataController {
       }
     }
   }
-    
+  
   func saveContext() throws {
     if context.hasChanges {
       return try self.context.save()

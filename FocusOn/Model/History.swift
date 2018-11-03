@@ -1,5 +1,5 @@
 //
-//  HistoryDataManager.swift
+//  History.swift
 //  FocusOn
 //
 //  Created by Spencer Forrest on 18/10/2018.
@@ -9,13 +9,11 @@
 import Foundation
 import CoreData
 
-class HistoryDataManager {
+class History {
   private let dataController: DataController!
-  
   init(_ dataController: DataController) {
     self.dataController = dataController
   }
-  
   func historyFetchResultsController() -> NSFetchedResultsController<Focus> {
     let fetchRequest: NSFetchRequest<Focus> = Focus.fetchRequest()
     let dateSortDescriptor = NSSortDescriptor(key: "date", ascending: false)

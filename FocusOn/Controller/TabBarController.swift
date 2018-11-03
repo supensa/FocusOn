@@ -12,6 +12,6 @@ class TabBarController: UITabBarController {
   override func viewDidLoad() {
     super.viewDidLoad()
     // Load second tab bar item
-    self.selectedIndex = 2
+    self.selectedIndex = 1
   }
 }

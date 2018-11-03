@@ -12,16 +12,17 @@ struct Constant {
   static let datamodelName = "Datamodel"
   static let persistentStorePath = "Application Support/Persistent Store"
   
-  static let contextSavingErrorMessage = "There was a problem saving your data but it is not your fault."
-    + "If you restart the app, you can try again."
+  static let contextSavingErrorMessage = "There was a problem saving your data but it is not your fault. "
+    + "If you restart the app, you can try again. "
     + "Please contact support to notify us of this issue:\n"
   static let contextSavingErrorTitle = "Could Not Save Data"
   
   static let goalCellId = "GoalCellId"
   static let taskCellId = "TaskCellId"
   
-  static let taskCompletion = "Great job on making progress!"
-  static let taskAttempt = "ah, no biggie, you’ll get it next time!"
+  static let taskCompleted = "Great job on making progress!"
+  static let taskFailed = "ah, no biggie, you’ll get it next time!"
+  static let taskNeedGoal = "You need a Goal before creating a Task!" 
   
   static let checkmark = "\u{2714}"
   
@@ -32,8 +33,8 @@ struct Constant {
   
   static let goalCompleted = "Congratulation !"
   static let goalUncompleted = "Goal for the day to focus on:"
-  static let taskCompleted = "All tasks completed !"
-  static let taskUncompleted = " more to achieve your goal"
+  static let allTasksCompleted = "All tasks completed !"
+  static let notAllTasksUncompleted = " more to achieve your goal"
   
   static let selectionBackgroundColor = UIColor(r: 239, g: 239, b: 244, alpha: 1)
   

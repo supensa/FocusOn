@@ -21,6 +21,7 @@ class TableViewCell: UITableViewCell {
     super.awakeFromNib()
     textFieldDelegation()
     setupTextViewBorder()
+    setCheckmark(false)
     setPlaceHolder()
   }
   

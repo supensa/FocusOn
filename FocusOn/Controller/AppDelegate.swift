@@ -17,13 +17,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Instantiate dataController for Core Data
     let dataController = DataController.init(xcdatamodeldName: Constant.datamodelName)
     dataController.load()
+    // Instantiate window and storyboard
+    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+    window = UIWindow()
+    window?.rootViewController = storyboard.instantiateInitialViewController()
     // Dependency Injection to children view controllers
     let tabBarController = window?.rootViewController as! TabBarController
     for children in tabBarController.viewControllers ?? [] {
-      if var children = children as? ViewControllerProtocol {
-        children.dataController = dataController
+      if let children = children as? ViewController {
+        children.setupDataController(dataController)
       }
     }
+    window?.makeKeyAndVisible()
     print(NSHomeDirectory())
     return true
   }

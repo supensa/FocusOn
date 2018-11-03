@@ -9,22 +9,15 @@
 import UIKit
 import CoreData
 
-class TodayViewController: UIViewController, ViewControllerProtocol {
-  
-  var dataController: DataController!
-  private var todayDataManager: TodayDataManager!
-  
-  private var isFromLastDay: Bool!
-  private var goal: Focus?
-  private var tasks = Dictionary<Int, Focus>()
-  
+class TodayViewController: ViewController {
+  internal var model: Today!
   @IBOutlet weak var tableView: UITableView!
-  
+  private var isFromLastDay: Bool!
+  private var willLoadlastDay = true
   private var accessoryView: UIView!
   private var saveButton: UIButton!
   private var clearButton: UIButton!
   private var deleteAllButton: UIButton!
-  
   private var goalHeaderLabel: UILabel!
   private var taskHeaderLabel: UILabel!
   private var triggerGoalAnimation = false
@@ -33,13 +26,19 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    todayDataManager = TodayDataManager(dataController)
-    
-    requestData()
+    model = Today(self.dataController)
+//    DummyData.generate(context: dataController.context)
+    isFromLastDay = model.loadData()
     tableViewDelegation()
     hideKeyboardWhenTappedAround()
     registerForKeyboardNotifications()
     setupAccessoryView()
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    if isFromLastDay && willLoadlastDay {
+      askConfirmation()
+    }
   }
   
   private func tableViewDelegation() {
@@ -47,81 +46,41 @@ class TodayViewController: UIViewController, ViewControllerProtocol {
     tableView.dataSource = self
   }
   
-  /// Retrieve a goal and its tasks
-  private func requestData() {
-    // Request today's goal if any
-    var results: [Focus] = todayDataManager.fetchResultsController(date: Date()).fetchedObjects ?? []
-    isFromLastDay = false
-    
-    if results.isEmpty {
-      // Request previous day's unachieved goal
-      if let goal = todayDataManager.requestLastUncompletedGoal() {
-        isFromLastDay = true
-        // Request previous day's unachieved goal and its tasks
-        let previousDate = goal.date!
-        results = todayDataManager.fetchResultsController(date: previousDate).fetchedObjects ?? []
-      }
-    }
-    
-    // Filter out the the Goal
-    goal = results.filter { return $0.type == Type.goal.rawValue }.first
-    // Filter out in "order" the Tasks
-    results = results.filter { return $0.type == Type.task.rawValue }
-    for result in results {
-      let index: Int = Int(result.order)
-      tasks[index] = result
-    }
-    
-    if isFromLastDay {
-      if let goal = goal { results.append(goal) }
-      askConfirmation(results: results)
-    }
-  }
-  
-  private func askConfirmation(results: [Focus]?) {
+  private func askConfirmation() {
     let title = "Uncompleted previous goal"
     let message = "Would you like this goal to become today's goal ?"
     let alertController = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
-    let noHandler = {
-      (action: UIAlertAction) in
-      self.goal = nil
-      self.tasks.removeAll()
-      self.tableView.reloadData()
-    }
-    let yesHandler = {
+    let yesAction = UIAlertAction(title: "Yes", style: .default)  {
       (action: UIAlertAction) in
       // Update (tasks and goal) dates to today
-      self.updateDates(results)
+      self.model.updateDates() { self.showSavingErrorToUser() }
     }
-    let yesAction = UIAlertAction(title: "Yes", style: .default, handler: yesHandler)
-    let noAction = UIAlertAction(title: "No", style: .cancel, handler: noHandler)
-    alertController.addAction(yesAction)
-    alertController.addAction(noAction)
-    present(alertController, animated: true, completion: nil)
-  }
-  
-  private func updateDates(_ results: [Focus]?) {
-    let date = Date()
-    for result in results ?? [] {
-      result.date = date
+    let noAction = UIAlertAction(title: "No", style: .destructive){
+      (action: UIAlertAction) in
+      self.model.resetData()
+      self.tableView.reloadData()
+      self.willLoadlastDay = false
     }
     
-    do {
-      try dataController.saveContext()
-    } catch {
-      let alertController = self.showErrorToUser()
-      self.present(alertController, animated: true, completion: nil)
+    alertController.addAction(yesAction)
+    alertController.addAction(noAction)
+    
+    if let popoverController = alertController.popoverPresentationController {
+      popoverController.sourceView = self.tableView
+      popoverController.sourceRect = CGRect(x: self.tableView.bounds.midX, y: self.tableView.bounds.maxY - 5, width: 0, height: 0)
+      popoverController.permittedArrowDirections = [UIPopoverArrowDirection.down]
     }
+    self.present(alertController, animated: false, completion: nil)
   }
   
-  private func showErrorToUser() -> UIAlertController {
+  private func showSavingErrorToUser() {
     let message =  Constant.contextSavingErrorMessage
     let alertController = UIAlertController(title: Constant.contextSavingErrorTitle,
                                             message: message,
                                             preferredStyle: .alert)
     let actionOk = UIAlertAction(title: "Got it", style: .default)
     alertController.addAction(actionOk)
-    return alertController
+    self.present(alertController, animated: false, completion: nil)
   }
 }
 
@@ -196,7 +155,8 @@ extension TodayViewController {
   
   @objc private func deleteAllButtonTapped() {
     clearButtonTapped()
-    removeAll()
+    model.deleteAll() { self.showSavingErrorToUser() }
+    tableView.reloadData()
     view.endEditing(true)
   }
   
@@ -208,65 +168,6 @@ extension TodayViewController {
       textView.text = ""
       tableView.updateUI()
     }
-  }
-}
-
-// -------------------------------------------------------------------------
-// MARK: - Context updates
-extension TodayViewController {
-  
-  /// Remove today's goal and tasks
-  @objc private func removeAll() {
-    guard goal != nil || tasks.count > 0
-      else { return }
-    
-    if let goal = goal {
-      dataController.context.delete(goal)
-    }
-    goal = nil
-    
-    for (_, task) in tasks {
-      dataController.context.delete(task)
-    }
-    tasks.removeAll()
-    
-    tableView.reloadData()
-    
-    do {
-      try dataController.saveContext()
-    } catch {
-      let alertController = self.showErrorToUser()
-      self.present(alertController, animated: true, completion: nil)
-    }
-  }
-  
-  /// Only remove this focus if it is a task.
-  /// Otherwise, remove all focuses for today
-  ///
-  /// - Parameter focus: focus to be removed
-  private func remove(focus: Focus) {
-    dataController.context.delete(focus)
-  }
-  
-  /// Update this focus
-  /// Update all the focuses'date
-  ///
-  /// - Parameters:
-  ///   - focus: focus to update
-  ///   - type: type of focus (goal or task)
-  ///   - text: title of focus
-  ///   - isCompleted: completion of focus
-  ///   - index: order of task
-  private func update(focus: Focus, type: Type, text: String?, index: Int) {
-    focus.type = type.rawValue
-    focus.title = text
-    if type == .task { focus.order = Int16(index) }
-    
-    let date = Date()
-    for (_,task) in tasks {
-      task.date = date
-    }
-    goal?.date = date
   }
 }
 
@@ -335,33 +236,27 @@ extension TodayViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let cell = tableView.cellForRow(at: indexPath) as? TableViewCell
       else { return }
-    
     trimming(textView: cell.textView)
-    
     if cell.textView.text != "" {
       view.endEditing(true)
     }
-    
     let isGoalCell = indexPath.section == 0
-    let hasTitle = !(cell.isPlaceHolderSet() || cell.textView.text == "")
-    
+    let hasTitle = !cell.isPlaceHolderSet() && cell.textView.text != ""
     switch (isGoalCell, hasTitle) {
     case (true, true):
-      manageGoalCellSelection(cell)
+      model.goal(isSelected: true) { self.showSavingErrorToUser() }
     case (false, true):
-      manageTaskCellSelection(cell, indexPath: indexPath)
+      model.task(isSelected: true, index: indexPath.row) { self.showSavingErrorToUser() }
+      triggerTaskAnimation = true
     default:
       cell.isSelected = false
       cell.setCheckmark(false)
       return
     }
-    tableView.reloadData()
-    do {
-      try dataController.saveContext()
-    } catch {
-      let alertController = self.showErrorToUser()
-      self.present(alertController, animated: true, completion: nil)
+    if model.isGoalCompleted {
+      triggerGoalAnimation = true
     }
+    tableView.reloadData()
   }
   
   // Process data when row is deselected and unchecked.
@@ -374,17 +269,13 @@ extension TodayViewController: UITableViewDelegate {
     }
     switch indexPath.section {
     case 0:
-      goal?.isCompleted = false
+      model.goal(isSelected: false, errorHandler: {self.showSavingErrorToUser()})
     default:
-      manageTaskCellDeSelection(row: indexPath.row)
+      model.task(isSelected: false, index: indexPath.row, errorHandler: {self.showSavingErrorToUser()})
+      taskUnchecked = true
+      triggerTaskAnimation = true
     }
     tableView.reloadData()
-    do {
-      try dataController.saveContext()
-    } catch {
-      let alertController = self.showErrorToUser()
-      self.present(alertController, animated: true, completion: nil)
-    }
   }
   
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -406,14 +297,19 @@ extension TodayViewController: UITableViewDelegate {
     var title: String?
     
     if section == 0 {
-      label.font = label.font.withSize(23)
-      title = goal?.isCompleted ?? false ? Constant.goalCompleted : Constant.goalUncompleted
-      label.textColor = goal?.isCompleted ?? false ? UIColor.red : UIColor.black
+      label.font = label.font.withSize(20)
+      title = model.isGoalCompleted ? Constant.goalCompleted : Constant.goalUncompleted
+      label.textColor = model.isGoalCompleted ? UIColor.red : UIColor.black
     }
     if section == 1 {
-      let count = countCompletedTasks()
-      let condition = tasks.count == count && tasks.count != 0
-      title = condition ? Constant.taskCompleted : "\(tasks.count - count)" + Constant.taskUncompleted
+      label.font = label.font.withSize(15)
+      let uncompletedTasksCount = model.uncompletedTasksCount
+      if model.goalTitle == nil {
+        title = Constant.taskNeedGoal
+        label.textColor = UIColor.red
+      } else {
+        title = model.areAllTasksCompleted ? Constant.allTasksCompleted : "\(uncompletedTasksCount)" + Constant.notAllTasksUncompleted
+      }
     }
     
     label.text = title
@@ -425,7 +321,7 @@ extension TodayViewController: UITableViewDelegate {
   }
   
   private func taskAnimation(isUncheckedTask: Bool) {
-    let temporaryMessage = taskUnchecked ? "Ah, no biggie, you’ll get it next time!" : "Great job on making progress!"
+    let temporaryMessage = taskUnchecked ? Constant.taskFailed : Constant.taskCompleted
     let color = taskUnchecked ? UIColor.red : UIColor.darkGreen
     
     let text = self.taskHeaderLabel.text
@@ -475,96 +371,6 @@ extension TodayViewController: UITableViewDelegate {
     triggerGoalAnimation = false
   }
   
-  /// Return the number of tasks without an empty title
-  ///
-  /// - Returns: Count of tasks
-  private func countTasksWithTitle() -> Int {
-    return tasks.filter {
-      let result = $1.title != ""
-      return result
-      }.count
-  }
-  
-  /// Return the number of completed tasks
-  ///
-  /// - Returns: Count of completed tasks
-  private func countCompletedTasks() -> Int {
-    return tasks.filter {
-      let result = $1.isCompleted
-      return result
-      }.count
-  }
-  
-  /// check mark goal and tasks cell if all tasks have a title.
-  /// Otherwise, only check mark gaol cell.
-  /// Save changes into persistent store. (chekmark = isCompleted)
-  ///
-  /// - Parameter cell: goal cell to process
-  private func manageGoalCellSelection(_ cell: TableViewCell) {
-    let allTasksHaveTitle = countTasksWithTitle() == tasks.count
-    if allTasksHaveTitle {
-      updateFocusesAs(isCompleted: allTasksHaveTitle)
-    } else {
-      updateFocusAsCompleted()
-    }
-  }
-  
-  /// Check mark task and goal cell if all tasks are completed.
-  /// Otherwise, only check mark task cell.
-  /// Save changes into persistent store. (chekmark = isCompleted)
-  ///
-  /// - Parameter cell: task cell to process
-  private func manageTaskCellSelection(_ cell: TableViewCell, indexPath: IndexPath) {
-    let areCompletedTasks = countCompletedTasks() == tasks.count - 1
-    if areCompletedTasks {
-      if goal?.title != "" {
-        updateFocusesAs(isCompleted: areCompletedTasks)
-      }
-    } else {
-      updateFocusAsCompleted(row: indexPath.row)
-    }
-  }
-  
-  /// Set task as uncomplete and goal cell, if needed.
-  /// Save changes into persistent store. (chekmark = isCompleted)
-  ///
-  /// - Parameter cell: task cell to process
-  private func manageTaskCellDeSelection(row: Int) {
-    tasks[row]?.isCompleted = false
-    if goal?.isCompleted ?? false {
-      goal?.isCompleted = false
-    }
-    taskUnchecked = true
-    triggerTaskAnimation = true
-  }
-  
-  /// Set goal and all tasks as completed or uncompleted and
-  /// save them into persistent store.
-  /// Then, reload the tableView's data.
-  ///
-  /// - Parameter isCompleted: true if tasks are completed
-  private func updateFocusesAs(isCompleted: Bool) {
-    goal?.isCompleted = isCompleted
-    for (_, task) in tasks {
-      task.isCompleted = isCompleted
-    }
-    triggerGoalAnimation = true
-  }
-  
-  /// set Focus (Goal or Task) as completed.
-  ///
-  /// - Parameters:
-  ///   - row: task's row
-  private func updateFocusAsCompleted(row: Int? = nil) {
-    if let row = row {
-      tasks[row]?.isCompleted = true
-      triggerTaskAnimation = true
-    } else {
-      goal?.isCompleted = true
-      triggerGoalAnimation = true
-    }
-  }
-  
   private func trimming(textView: UITextView) {
     textView.text = textView.text.trimmingCharacters(in: .whitespacesAndNewlines)
     tableView.updateUI()
@@ -596,7 +402,6 @@ extension TodayViewController: UITableViewDataSource {
       }
     default: break
     }
-    
     return UITableViewCell()
   }
   
@@ -611,17 +416,17 @@ extension TodayViewController: UITableViewDataSource {
   ///   - cell: task cell
   ///   - row: cell's in table view
   private func setupGoalCell(cell: GoalTableViewCell, indexPath: IndexPath) {
-    if let title = goal?.title {
+    if let title = model.goalTitle {
       cell.textView.text = title
       cell.textView.textColor = UIColor.black
     } else {
       cell.setPlaceHolder()
     }
+    cell.tag = -1
     cell.textView.inputAccessoryView = accessoryView
     cell.delegate = self
     setCellSelectionColor(cell: cell)
-    let isSelected = goal?.isCompleted ?? false
-    selectionRow(isSelected: isSelected, cell: cell, indexPath: indexPath)
+    selectionRow(isSelected: model.isGoalCompleted, cell: cell, indexPath: indexPath)
   }
   
   /// Setup task cell's label and text field
@@ -631,7 +436,7 @@ extension TodayViewController: UITableViewDataSource {
   ///   - row: cell's in table view
   private func setupTaskCell(cell: TaskTableViewCell, indexPath: IndexPath) {
     let row = indexPath.row
-    if let title = tasks[row]?.title {
+    if let title = model.taskTitle(order: row) {
       cell.textView.text = title
       cell.textView.textColor = UIColor.black
     } else {
@@ -642,7 +447,7 @@ extension TodayViewController: UITableViewDataSource {
     cell.textView.inputAccessoryView = accessoryView
     cell.delegate = self
     setCellSelectionColor(cell: cell)
-    let isSelected = tasks[row]?.isCompleted ?? false
+    let isSelected = model.isCompletedTask(order: row)
     selectionRow(isSelected: isSelected, cell: cell, indexPath: indexPath)
   }
   
@@ -687,60 +492,20 @@ extension TodayViewController: TableViewCellDelegate {
   
   func textViewDidFinishEditing(cell: TableViewCell, tag index: Int) {
     tableView.updateUI()
-    // No need to save if no changes
+    // No need to process data if no changes
     guard cell.formerText != cell.textView.text else { return }
-    processData(from: cell, index: index)
-  }
-  
-  /// Update or remove a "Focus" from context and persistent store
-  ///
-  /// - Parameters:
-  ///   - cell: cell containing the data
-  ///   - index: Order of the cell (for tasks cell)
-  private func processData(from cell: TableViewCell, index: Int) {
-    var focus: Focus!
-    var typeCell: Type!
-    var isNewTask: Bool = false
+    var type: Type!
     // Check if input comes from a GoalTableViewCell or TaskTableViewCell
     // Get NSManagedObject accordingly
     if let _ = cell as? GoalTableViewCell {
-      goal = goal ?? Focus(context: dataController.context)
-      focus = goal
-      typeCell = .goal
+      type = .goal
     }
     if let _ = cell as? TaskTableViewCell {
-      if tasks[index] == nil { isNewTask = true }
-      tasks[index] = tasks[index] ?? Focus(context: dataController.context)
-      focus = tasks[index]
-      typeCell = .task
+      type = .task
     }
-    // NSManagedObject will be removed if text is empty.
-    // Otherwise, it will be updated
-    if cell.textView.text == "" {
-      remove(focus: focus)
-      if typeCell == .task { tasks[index] = nil }
-      if typeCell == .goal { goal = nil }
-    } else {
-      update(focus: focus, type: typeCell, text: cell.textView.text, index: index)
-      deselectGoalCell(isNewTask)
+    model.processData(title: cell.textView.text, order: index, type: type) {
+      self.showSavingErrorToUser()
     }
     tableView.reloadData()
-    // Commit the change to context and persistent store
-    do {
-      try dataController.saveContext()
-    } catch {
-      let alertController = self.showErrorToUser()
-      self.present(alertController, animated: true, completion: nil)
-    }
-  }
-  
-  /// Set goal as not completed,
-  /// then reload the tableView's data.
-  ///
-  /// - Parameter isNeeded: force the deselection
-  private func deselectGoalCell(_ forced: Bool) {
-    if forced {
-      goal?.isCompleted = false
-    }
   }
 }

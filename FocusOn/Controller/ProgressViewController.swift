@@ -9,26 +9,22 @@
 import UIKit
 import Charts
 
-class ProgressViewController: UIViewController, ViewControllerProtocol {
-  
+class ProgressViewController: ViewController {
   @IBOutlet weak var barChartView: HorizontalBarChartView!
   @IBOutlet weak var segmentControl: UISegmentedControl!
-  
-  var dataController: DataController!
-  private var progressDataManager: ProgressDataManager!
-  
   var labels = [String]()
-  
   var completedGoals = [Double]()
   var completedTasks = [Double]()
-  
   var goalDataSet: BarChartDataSet!
   var taskDataSet: BarChartDataSet!
+  private var model: Progress!
   
   override func viewDidLoad() {
     super.viewDidLoad()
+    model = Progress(self.dataController)
+    segmentControl.selectedSegmentIndex = 0
+    
     barChartView.noDataText = "You need to provide data for this chart."
-    progressDataManager = ProgressDataManager.init(dataController)
     //legend
     let legend = barChartView.legend
     legend.enabled = true
@@ -87,17 +83,19 @@ class ProgressViewController: UIViewController, ViewControllerProtocol {
     let index = isEmpty ? -1 : self.segmentControl.selectedSegmentIndex
     switch index {
     case Constant.monthlySegmentIndex:
-      let results = progressDataManager.monthlyCompletedFocuses()
-      let labels = progressDataManager.labels
-      self.updateCompletedFocuses(results: results, labels: labels)
+      let tuple = model.completedFocuses(isWeekly: false)
+      self.completedGoals = tuple.0
+      self.completedTasks = tuple.1
+      self.labels = model.labels
     case Constant.weeklySegmentIndex:
-      let results = progressDataManager.weeklyCompletedFocuses()
-      let labels = progressDataManager.labels
-      self.updateCompletedFocuses(results: results, labels: labels)
+      let tuple = model.completedFocuses(isWeekly: true)
+      self.completedGoals = tuple.0
+      self.completedTasks = tuple.1
+      self.labels = model.labels
     default:
-      let results = [String : [Double]]()
-      let labels = [String]()
-      self.updateCompletedFocuses(results: results, labels: labels)
+      self.labels = [String]()
+      self.completedGoals = [Double]()
+      self.completedTasks = [Double]()
     }
     
     let xaxis = barChartView.xAxis
@@ -105,20 +103,6 @@ class ProgressViewController: UIViewController, ViewControllerProtocol {
     xaxis.setLabelCount(self.labels.count, force: false)
     
     setChart()
-  }
-  
-  private func updateCompletedFocuses(results: [String : [Double]], labels: [String]) {
-    self.labels = labels
-    self.completedGoals = [Double]()
-    self.completedTasks = [Double]()
-    for label in labels {
-      if let goalResult = results[label]?[0] {
-        self.completedGoals.append(goalResult)
-      }
-      if let taskResult = results[label]?[1] {
-        self.completedTasks.append(taskResult)
-      }
-    }
   }
   
   private func setChart() {

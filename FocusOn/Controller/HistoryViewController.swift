@@ -9,21 +9,17 @@
 import UIKit
 import CoreData
 
-class HistoryViewController: UIViewController, ViewControllerProtocol {
-  
+class HistoryViewController: ViewController {
   @IBOutlet weak var dateLabel: UILabel!
   @IBOutlet weak var completionLabel: UILabel!
   @IBOutlet weak var tableView: UITableView!
-  
-  var dataController: DataController!
-  private var historyDataManager: HistoryDataManager!
-  var fetchedResultsController: NSFetchedResultsController<Focus>!
-  
+  private var model: History!
+  private var fetchedResultsController: NSFetchedResultsController<Focus>!
   private var lastContentOffset: CGFloat = 0
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    historyDataManager = HistoryDataManager(dataController)
+    model = History(self.dataController)
     tableView.delegate = self
     tableView.dataSource = self
     setupCompletionLabelBorder()
@@ -37,7 +33,7 @@ class HistoryViewController: UIViewController, ViewControllerProtocol {
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    fetchedResultsController = historyDataManager.historyFetchResultsController()
+    fetchedResultsController = model.historyFetchResultsController()
     tableView.reloadData()
     updateDateLabel()
     updateCompletionLabel()
@@ -67,20 +63,21 @@ extension HistoryViewController: UITableViewDataSource {
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    if fetchedResultsController == nil { return UITableViewCell() }
+    var cell = UITableViewCell()
+    if fetchedResultsController == nil { return cell }
     let focus: Focus = fetchedResultsController.object(at: indexPath)
-    
-    if let cell = tableView.dequeueReusableCell(withIdentifier: "HistoryCellId") as? HistoryTableViewCell {
-      cell.label.text = focus.isCompleted ? Constant.checkmark : ""
-      cell.textView.text = focus.title!
+    if let reusableCell = tableView.dequeueReusableCell(withIdentifier: "HistoryCellId") as? HistoryTableViewCell {
+      reusableCell.label.text = focus.isCompleted ? Constant.checkmark : ""
+      reusableCell.label.font = reusableCell.label.font.withSize(15)
+      reusableCell.textView?.font = reusableCell.textView?.font?.withSize(15)
       if focus.type == Type.goal.rawValue {
-        cell.textView?.font = cell.textView?.font?.withSize(30)
+        reusableCell.textView.text = focus.title!
       } else {
-        cell.textView?.font = cell.textView?.font?.withSize(15)
+        reusableCell.textView.text = "\t" + focus.title!
       }
-      return cell
+      cell = reusableCell
     }
-    return UITableViewCell()
+    return cell
   }
   
   func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
