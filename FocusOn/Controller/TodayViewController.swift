@@ -35,7 +35,8 @@ class TodayViewController: ViewController {
     setupAccessoryView()
   }
   
-  override func viewDidAppear(_ animated: Bool) {
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
     if isFromLastDay && willLoadlastDay {
       askConfirmation()
     }
@@ -46,20 +47,42 @@ class TodayViewController: ViewController {
     tableView.dataSource = self
   }
   
+  private var alertWindow: UIWindow? = UIWindow()
+  private var viewController: UIViewController? = UIViewController()
+  
+  private func show(_ alertViewController: UIViewController) {
+    let screen = UIScreen.main
+    alertWindow = UIWindow(frame: screen.bounds)
+    alertWindow?.rootViewController = viewController
+    
+    let topWindow = UIApplication.shared.windows.last
+    if let topWindowLevel = topWindow?.windowLevel {
+      alertWindow?.windowLevel = topWindowLevel + 1
+    }
+    
+    alertWindow?.makeKeyAndVisible()
+    if let viewController = alertWindow?.rootViewController {
+      viewController.present(alertViewController, animated: true)
+    }
+  }
+  
+  private func removeAlertWindow() {
+    alertWindow = nil
+  }
+  
   private func askConfirmation() {
     let title = "Uncompleted previous goal"
     let message = "Would you like this goal to become today's goal ?"
     let alertController = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
     let yesAction = UIAlertAction(title: "Yes", style: .default)  {
       (action: UIAlertAction) in
-      // Update (tasks and goal) dates to today
-      self.model.updateDates() { self.showSavingErrorToUser() }
+      self.yesAction()
+      self.removeAlertWindow()
     }
     let noAction = UIAlertAction(title: "No", style: .destructive){
-      (action: UIAlertAction) in
-      self.model.resetData()
-      self.tableView.reloadData()
-      self.willLoadlastDay = false
+      (_: UIAlertAction) in
+      self.noAction()
+      self.removeAlertWindow()
     }
     
     alertController.addAction(yesAction)
@@ -70,7 +93,18 @@ class TodayViewController: ViewController {
       popoverController.sourceRect = CGRect(x: self.tableView.bounds.midX, y: self.tableView.bounds.maxY - 5, width: 0, height: 0)
       popoverController.permittedArrowDirections = [UIPopoverArrowDirection.down]
     }
-    self.present(alertController, animated: false, completion: nil)
+    show(alertController)
+  }
+  
+  private func noAction() {
+    self.model.resetData()
+    self.tableView.reloadData()
+    self.willLoadlastDay = false
+  }
+  
+  private func yesAction() {
+    // Update (tasks and goal) dates to today
+    self.model.updateDates() { self.showSavingErrorToUser() }
   }
   
   private func showSavingErrorToUser() {

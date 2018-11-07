@@ -32,6 +32,8 @@ class Today {
   }
   
   /// Retrieve a goal and its tasks
+  ///
+  /// - Returns: True if data is from previous uncompleted Goal
   func loadData() -> Bool {
     // Request today's goal if any
     results = self.fetchResultsController(date: Date()).fetchedObjects ?? []
@@ -112,7 +114,6 @@ class Today {
     updateAll(date: date, type: nil, title: nil, order: nil, isCompleted: nil, errorHandler: errorHandler)
   }
   
-  // TODO: if no Goal then removal + no save
   func processData(title: String, order: Int, type: Type, errorHandler: (()->())? = nil) {
     if title == "" {
       processDataRemoval(type: type, order: order, errorHandler: errorHandler)

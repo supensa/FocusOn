@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -14,18 +15,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    // Ask permission to use User Notification
+    UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound], completionHandler: {(bool, error) in })
     // Instantiate dataController for Core Data
     let dataController = DataController.init(xcdatamodeldName: Constant.datamodelName)
     dataController.load()
     // Instantiate window and storyboard
-    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+    let storyboard = UIStoryboard(name: Constant.storyboardName, bundle: nil)
     window = UIWindow()
     window?.rootViewController = storyboard.instantiateInitialViewController()
     // Dependency Injection to children view controllers
     let tabBarController = window?.rootViewController as! TabBarController
-    for children in tabBarController.viewControllers ?? [] {
-      if let children = children as? ViewController {
-        children.setupDataController(dataController)
+    if let children = tabBarController.viewControllers {
+      for child in children {
+        if let child = child as? ViewController {
+          child.setupDataController(dataController)
+        }
       }
     }
     window?.makeKeyAndVisible()

@@ -40,6 +40,7 @@ class TodayViewControllerTests: XCTestCase {
     let mainView = View()
     let firstContainerView = View()
     let secondContrainerView = View()
+    let segmentControl = View()
     let button = View()
     let label = View()
     label.title = "first responder"
@@ -47,8 +48,9 @@ class TodayViewControllerTests: XCTestCase {
     
     secondContrainerView.addSubview(button)
     secondContrainerView.addSubview(label)
-    firstContainerView.addSubview(secondContrainerView)
+    firstContainerView.addSubview(segmentControl)
     mainView.addSubview(firstContainerView)
+    mainView.addSubview(secondContrainerView)
     window?.addSubview(mainView)
     
     let firstResponder = mainView.firstResponder as! View
@@ -66,6 +68,7 @@ class TodayViewControllerTests: XCTestCase {
     if todayViewController.view == nil {
       XCTFail("View did not Load")
     }
+    todayViewController.viewDidAppear(false)
     let tableView: UITableView = todayViewController.tableView
     let goalCell = todayViewController.tableView(tableView, cellForRowAt: IndexPath(row: 0, section: 0)) as! TableViewCell
     let task0Cell = todayViewController.tableView(tableView, cellForRowAt: IndexPath(row: 0, section: 1)) as! TableViewCell
@@ -85,13 +88,11 @@ class TodayViewControllerTests: XCTestCase {
   func testGivenTodayViewDidLoaded_WhenDeselectingRow_ThenUpdateModel() {
     instantiateDataForToday()
     saveContext()
-    
     let storyboard = UIStoryboard(name: "Main", bundle: nil)
     let todayViewController = storyboard.instantiateViewController(withIdentifier: "TodayViewController") as! TodayViewController
     todayViewController.setupDataController(dataController)
     _ = todayViewController.view
     let tableView: UITableView = todayViewController.tableView
-    tableView.isEditing = false
     _ = todayViewController.tableView(tableView, cellForRowAt: IndexPath(row: 0, section: 0))
     _ = todayViewController.tableView(tableView, cellForRowAt: IndexPath(row: 0, section: 1))
     _ = todayViewController.tableView(tableView, cellForRowAt: IndexPath(row: 1, section: 1))
@@ -115,19 +116,18 @@ class TodayViewControllerTests: XCTestCase {
   func testGivenTodayViewDidLoaded_WhenSelectingRow_ThenUpdateModel() {
     instantiateDataForToday()
     saveContext()
-    
     let storyboard = UIStoryboard(name: "Main", bundle: nil)
     let todayViewController = storyboard.instantiateViewController(withIdentifier: "TodayViewController") as! TodayViewController
     todayViewController.setupDataController(dataController)
     _ = todayViewController.view
     let tableView: UITableView = todayViewController.tableView
-    tableView.isEditing = false
     _ = todayViewController.tableView(tableView, cellForRowAt: IndexPath(row: 0, section: 0))
     _ = todayViewController.tableView(tableView, cellForRowAt: IndexPath(row: 0, section: 1))
     _ = todayViewController.tableView(tableView, cellForRowAt: IndexPath(row: 1, section: 1))
     _ = todayViewController.tableView(tableView, cellForRowAt: IndexPath(row: 2, section: 1))
-    todayViewController.tableView(tableView, didSelectRowAt: IndexPath(row: 2, section: 1))
     let today: Today = todayViewController.model
+    XCTAssertEqual(today.isCompletedTask(order: 2), false)
+    todayViewController.tableView(tableView, didSelectRowAt: IndexPath(row: 2, section: 1))
     XCTAssertEqual(today.isCompletedTask(order: 2), true)
     todayViewController.tableView(tableView, didSelectRowAt: IndexPath(row: 0, section: 0))
     XCTAssertEqual(today.isGoalCompleted, true)
@@ -167,6 +167,15 @@ class TodayViewControllerTests: XCTestCase {
     task2.type = Type.task.rawValue
   }
   
+  private func saveContext() {
+    do {
+      try dataController.saveContext()
+    } catch {
+      let error = error as NSError
+      XCTFail(error.debugDescription)
+    }
+  }
+  
   // This class is needed to test 'First responder'
   private class View: UIView {
     var title = "Not First Responder"
@@ -176,15 +185,6 @@ class TodayViewControllerTests: XCTestCase {
     
     override var canResignFirstResponder: Bool {
       return true
-    }
-  }
-  
-  private func saveContext() {
-    do {
-      try dataController.saveContext()
-    } catch {
-      let error = error as NSError
-      XCTFail(error.debugDescription)
     }
   }
 }

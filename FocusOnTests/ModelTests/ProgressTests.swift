@@ -37,7 +37,6 @@ class ProgressTests: XCTestCase {
   
   func testGivenProgress_WhenFetchingMonthlyCompletedFocusesPercentage_ThenMonthlyCompletedFocusesPercentageFetched() {
     dataForCurrentYear()
-    // TODO: Create Test Data + update test
     let progress = Progress.init(dataController)
     let results = progress.completedFocuses(isWeekly: false)
     let goalResults: [Double] = results.0.reversed()

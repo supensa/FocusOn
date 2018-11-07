@@ -9,8 +9,15 @@
 import UIKit
 
 struct Constant {
+  static let storyboardName = "Main"
+  
   static let datamodelName = "Datamodel"
   static let persistentStorePath = "Application Support/Persistent Store"
+  
+  static let notificationHourInterval = 4
+  static let notificationIdentifier = "FocusOn"
+  static let notificationTitle = "FocusOn your goal"
+  static let notificationBody = "Check your progress"
   
   static let contextSavingErrorMessage = "There was a problem saving your data but it is not your fault. "
     + "If you restart the app, you can try again. "

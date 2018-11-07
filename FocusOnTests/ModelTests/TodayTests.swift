@@ -82,7 +82,6 @@ class TodayTests: XCTestCase {
     today.processData(title: "", order: 2, type: .task)
     XCTAssertEqual(today.areAllTasksCompleted, true)
     XCTAssertEqual(today.isCompletedTask(order: 1), true)
-    today.resetData()
     _ = today.loadData()
     XCTAssertEqual(today.areAllTasksCompleted, true)
     XCTAssertEqual(today.isCompletedTask(order: 1), true)
