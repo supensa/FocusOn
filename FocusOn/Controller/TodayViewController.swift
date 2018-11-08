@@ -13,7 +13,6 @@ class TodayViewController: ViewController {
   internal var model: Today!
   @IBOutlet weak var tableView: UITableView!
   private var isFromLastDay: Bool!
-  private var willLoadlastDay = true
   private var accessoryView: UIView!
   private var saveButton: UIButton!
   private var clearButton: UIButton!
@@ -37,8 +36,9 @@ class TodayViewController: ViewController {
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    if isFromLastDay && willLoadlastDay {
+    if isFromLastDay {
       askConfirmation()
+      isFromLastDay = false
     }
   }
   
@@ -48,22 +48,17 @@ class TodayViewController: ViewController {
   }
   
   private var alertWindow: UIWindow? = UIWindow()
-  private var viewController: UIViewController? = UIViewController()
   
   private func show(_ alertViewController: UIViewController) {
     let screen = UIScreen.main
     alertWindow = UIWindow(frame: screen.bounds)
-    alertWindow?.rootViewController = viewController
-    
+    alertWindow?.rootViewController = UIViewController()
     let topWindow = UIApplication.shared.windows.last
     if let topWindowLevel = topWindow?.windowLevel {
       alertWindow?.windowLevel = topWindowLevel + 1
     }
-    
     alertWindow?.makeKeyAndVisible()
-    if let viewController = alertWindow?.rootViewController {
-      viewController.present(alertViewController, animated: true)
-    }
+    alertWindow?.rootViewController?.present(alertViewController, animated: true)
   }
   
   private func removeAlertWindow() {
@@ -99,7 +94,6 @@ class TodayViewController: ViewController {
   private func noAction() {
     self.model.resetData()
     self.tableView.reloadData()
-    self.willLoadlastDay = false
   }
   
   private func yesAction() {
