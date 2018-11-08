@@ -66,8 +66,8 @@ class TodayViewController: ViewController {
   }
   
   private func askConfirmation() {
-    let title = "Uncompleted previous goal"
-    let message = "Would you like this goal to become today's goal ?"
+    let title = Constant.confirmationTitle
+    let message = Constant.confirmationMessage
     let alertController = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
     let yesAction = UIAlertAction(title: "Yes", style: .default)  {
       (action: UIAlertAction) in

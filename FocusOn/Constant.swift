@@ -19,6 +19,9 @@ struct Constant {
   static let notificationTitle = "FocusOn your goal"
   static let notificationBody = "Check your progress"
   
+  static let confirmationTitle = "Uncompleted previous goal"
+  static let confirmationMessage = "Would you like this goal to become today's goal ?"
+  
   static let contextSavingErrorMessage = "There was a problem saving your data but it is not your fault. "
     + "If you restart the app, you can try again. "
     + "Please contact support to notify us of this issue:\n"
