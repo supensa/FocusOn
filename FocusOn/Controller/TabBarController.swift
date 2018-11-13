@@ -45,6 +45,7 @@ class TabBarController: UITabBarController {
     }
   }
   
+  /// Converts hours to seconds
   private func hoursToSecond(_ hour: Int) -> TimeInterval{
     return TimeInterval(hour * 3600)
   }

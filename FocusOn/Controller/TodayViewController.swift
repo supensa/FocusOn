@@ -49,28 +49,31 @@ class TodayViewController: ViewController {
   
   private var alertWindow: UIWindow? = UIWindow()
   
-  private func show(_ alertViewController: UIViewController) {
+  // Create a new UIWindow make it key and visible to present a UIAlertController
+  private func show(_ alertViewController: UIAlertController) {
     let screen = UIScreen.main
     alertWindow = UIWindow(frame: screen.bounds)
     alertWindow?.rootViewController = UIViewController()
-    let topWindow = UIApplication.shared.windows.last
-    if let topWindowLevel = topWindow?.windowLevel {
-      alertWindow?.windowLevel = topWindowLevel + 1
-    }
     alertWindow?.makeKeyAndVisible()
     alertWindow?.rootViewController?.present(alertViewController, animated: true)
   }
   
+  // Remove the new UIWindow
   private func removeAlertWindow() {
     alertWindow = nil
   }
   
+  /**
+   Create a UIAlertController and show it to the user.
+   Ask wether the user wants to keep the last uncompleted Goal and its related tasks
+   as today's new Goal and tasks
+  **/
   private func askConfirmation() {
     let title = Constant.confirmationTitle
     let message = Constant.confirmationMessage
     let alertController = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
     let yesAction = UIAlertAction(title: "Yes", style: .default)  {
-      (action: UIAlertAction) in
+      (_: UIAlertAction) in
       self.yesAction()
       self.removeAlertWindow()
     }
@@ -88,6 +91,7 @@ class TodayViewController: ViewController {
       popoverController.sourceRect = CGRect(x: self.tableView.bounds.midX, y: self.tableView.bounds.maxY - 5, width: 0, height: 0)
       popoverController.permittedArrowDirections = [UIPopoverArrowDirection.down]
     }
+    
     show(alertController)
   }
   
@@ -101,12 +105,13 @@ class TodayViewController: ViewController {
     self.model.updateDates() { self.showSavingErrorToUser() }
   }
   
+  /// Error message concerning the failure to save data.
   private func showSavingErrorToUser() {
     let message =  Constant.contextSavingErrorMessage
     let alertController = UIAlertController(title: Constant.contextSavingErrorTitle,
                                             message: message,
                                             preferredStyle: .alert)
-    let actionOk = UIAlertAction(title: "Got it", style: .default)
+    let actionOk = UIAlertAction(title: "Ok", style: .default)
     alertController.addAction(actionOk)
     self.present(alertController, animated: false, completion: nil)
   }
@@ -114,6 +119,7 @@ class TodayViewController: ViewController {
 
 // -------------------------------------------------------------------------
 // MARK: - Accesory View setup
+// Setup "inputAccessoryView" that will be above the keyboard.
 extension TodayViewController {
   private func setupAccessoryView() {
     instantiateAccessoryView()
@@ -201,6 +207,8 @@ extension TodayViewController {
 
 // -------------------------------------------------------------------------
 // MARK: - Keyboard layout
+// Notify when keyboard appears or dissapears
+// Change TableView layout accordingly
 extension TodayViewController {
   
   private func registerForKeyboardNotifications() {
@@ -209,7 +217,7 @@ extension TodayViewController {
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: keyboardWillShowNotification, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: keyboardWillHideNotification, object: nil)
   }
-  
+
   @objc private func keyboardWillShow(notification: NSNotification) {
     let keyboardFrame = notification.userInfo![UIResponder.keyboardFrameEndUserInfoKey] as! CGRect
     adjustLayoutForKeyboard(targetHeight: keyboardFrame.size.height)
@@ -240,9 +248,9 @@ extension TodayViewController {
 
 // -------------------------------------------------------------------------
 // MARK: - Gesture recognizer delegate
+// TableView's Cells won't trigger UITapGestureRecognizer.
+// No interference with keyboard dissmissal and edit textField.
 extension TodayViewController: UIGestureRecognizerDelegate {
-  // TableView's Cells won't trigger UITapGestureRecognizer.
-  // No interference with keyboard dissmissal and edit textField.
   func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
     if let view = touch.view {
       for cell in tableView.visibleCells {
@@ -306,6 +314,8 @@ extension TodayViewController: UITableViewDelegate {
     tableView.reloadData()
   }
   
+  // Setup custom header for each section
+  // Animate the headers if needed
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
     if section == 0 {
       goalHeaderLabel = UILabel()
@@ -442,7 +452,7 @@ extension TodayViewController: UITableViewDataSource {
   ///
   /// - Parameters:
   ///   - cell: task cell
-  ///   - row: cell's in table view
+  ///   - indexPath: tableView indexPath
   private func setupGoalCell(cell: GoalTableViewCell, indexPath: IndexPath) {
     if let title = model.goalTitle {
       cell.textView.text = title
@@ -461,7 +471,7 @@ extension TodayViewController: UITableViewDataSource {
   ///
   /// - Parameters:
   ///   - cell: task cell
-  ///   - row: cell's in table view
+  ///   - indexPath: indexPath of the cell in TableView
   private func setupTaskCell(cell: TaskTableViewCell, indexPath: IndexPath) {
     let row = indexPath.row
     if let title = model.taskTitle(order: row) {
@@ -485,7 +495,7 @@ extension TodayViewController: UITableViewDataSource {
   /// - Parameters:
   ///   - isSelected: cell should be selected
   ///   - cell: cell to select or deselect
-  ///   - indexPath: indexPath of cell in TableView
+  ///   - indexPath: indexPath of the cell in TableView
   private func selectionRow(isSelected: Bool, cell: TableViewCell, indexPath: IndexPath) {
     if isSelected {
       tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
@@ -499,8 +509,7 @@ extension TodayViewController: UITableViewDataSource {
   /// Set the selection color that will apply
   ///
   /// - Parameters:
-  ///   - color: Selection color
-  ///   - cell: cell to apply it
+  ///   - cell: cell to be colored
   private func setCellSelectionColor(cell: UITableViewCell) {
     cell.selectedBackgroundView = UIView()
     cell.selectedBackgroundView?.backgroundColor = Constant.selectionBackgroundColor
@@ -510,6 +519,7 @@ extension TodayViewController: UITableViewDataSource {
 // -------------------------------------------------------------------------
 // MARK: - Tableview cell delegate
 extension TodayViewController: TableViewCellDelegate {
+  // Resize the cell dynamically with an animation
   func dynamicSize(cell: TableViewCell) {
     tableView.updateUI()
     // Keep the bottom of the cell visible on the screen
