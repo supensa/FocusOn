@@ -39,6 +39,7 @@ class HistoryViewController: ViewController {
     updateCompletionLabel()
   }
   
+  // Setup a bottom border for completion label
   private func setupCompletionLabelBorder() {
     let bottomBorder = CALayer()
     bottomBorder.backgroundColor = UIColor.gray.cgColor
@@ -86,7 +87,7 @@ extension HistoryViewController: UITableViewDataSource {
 }
 
 // -------------------------------------------------------------------------
-// MARK: - Scroll view delegate
+// MARK: - TableView delegate
 extension HistoryViewController: UITableViewDelegate {
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
     let focus: Focus  = fetchedResultsController.sections?[section].objects?.first as! Focus
@@ -127,6 +128,8 @@ extension HistoryViewController: UITableViewDelegate {
 
 // -------------------------------------------------------------------------
 // MARK: - Scroll view delegate
+// Detect the direction of the scroll motion, up or down.
+// Update completion and date labels accordingly to motion
 extension HistoryViewController: UIScrollViewDelegate {
   
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -136,6 +139,10 @@ extension HistoryViewController: UIScrollViewDelegate {
     updateCompletionLabel(direction: scrollDirection)
   }
   
+  /// Detect if the scroll was a up or down
+  ///
+  /// - Parameter scrollView: scrollView that has been used
+  /// - Returns: Direction
   private func scrollingDirection(_ scrollView: UIScrollView) -> ScrollDirection {
     var scrollDirection = ScrollDirection.none
     
@@ -150,6 +157,9 @@ extension HistoryViewController: UIScrollViewDelegate {
     return scrollDirection
   }
   
+  /// Update the date label accordingly to scroll direction
+  ///
+  /// - Parameter direction: scroll direction
   private func updateDateLabel(direction: ScrollDirection = .up) {
     guard let date = dateFromVisibleCell(direction: direction) else {
       self.dateLabel.text = "No data saved so far"
@@ -169,6 +179,9 @@ extension HistoryViewController: UIScrollViewDelegate {
     return focus.date
   }
   
+  /// Update the completion label accordingly to scroll direction
+  ///
+  /// - Parameter direction: scroll direction
   private func updateCompletionLabel(direction: ScrollDirection = .up) {
     let goals = getMonthlyGoals(direction: direction)
     let total = goals?.count ?? 0

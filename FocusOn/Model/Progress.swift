@@ -21,27 +21,38 @@ class Progress {
   }
   
   /**
-   Return percentages of completed Focuses.
-   * First array for the Goals.
-   * Second array for the Tasks
+   Return percentages of completed Focuses sorted by time in ascending order.
+   
    - Parameter isWeekly: Weekly or monthly report
-   - Returns: A tuple
+   - Returns: A tuple of arrays
+      - First: Goals
+      - Last: Tasks
    */
   func completedFocuses(isWeekly: Bool) -> ([Double],[Double]) {
     let results = isWeekly ? weeklyCompletedFocuses() : monthlyCompletedFocuses()
     var completedTasks = [Double]()
     var completedGoals = [Double]()
     for label in _labels {
-      if let goalResult = results[label]?[0] {
+      if let goalResult = results[label]?.first {
         completedGoals.append(goalResult)
       }
-      if let taskResult = results[label]?[1] {
+      if let taskResult = results[label]?.last {
         completedTasks.append(taskResult)
       }
     }
     return (completedGoals, completedTasks)
   }
   
+  /**
+   Data concerning the percentages of completed focuses (goals and tasks) for each month.
+   
+   The data are stored in a dictionary:
+   * Key: Reprensation of the month (short month symbols)
+   * Value: Array of focuses
+      * First: Percentage of completed Goals
+      * Last: Percentage of completed Tasks
+   - Returns: dictionary
+   */
   private func monthlyCompletedFocuses() -> [String:[Double]] {
     var dataStructure = [String:[Double]]()
     var data = [Focus]()
@@ -49,10 +60,8 @@ class Progress {
       data = results
     }
     self._labels = [String]()
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = Constant.monthShortDateFormat
-    let goals = self.percentageOfMonthlyCompletedFocuses(data: data, type: Type.goal.rawValue, dateFormatter: dateFormatter)
-    let tasks = self.percentageOfMonthlyCompletedFocuses(data: data, type: Type.task.rawValue, dateFormatter: dateFormatter)
+    let goals = self.percentageOfMonthlyCompletedFocuses(data: data, type: Type.goal.rawValue)
+    let tasks = self.percentageOfMonthlyCompletedFocuses(data: data, type: Type.task.rawValue)
     let months = self.months(data)
     if !goals.isEmpty || !tasks.isEmpty {
       dataStructure = self.dataStructureForMonthlyCompletedFocuses(months: months, goals: goals, tasks: tasks)
@@ -60,6 +69,16 @@ class Progress {
     return dataStructure
   }
   
+  /**
+   Data concerning the percentages of completed focuses (goals and tasks) for each week.
+   
+   The data are stored in a dictionary:
+   * Key: Reprensation of the week
+   * Value: Array of focuses
+      * First: Percentage of completed Goals
+      * Last: Percentage of completed Tasks
+   - Returns: dictionary
+   */
   private func weeklyCompletedFocuses() -> [String:[Double]] {
     var dataStructure = [String:[Double]]()
     var data = [Focus]()
@@ -91,7 +110,14 @@ class Progress {
     return fetchedResultsController
   }
   
-  private func percentageOfMonthlyCompletedFocuses(data: [Focus], type: String, dateFormatter: DateFormatter) -> [Double] {
+  /// Return percentage of completed Focuses (Goal or Task) per month
+  /// - Parameters:
+  ///   - data: Array of all Focuses
+  ///   - type: Type of Focus (goal or task) to analyze
+  /// - Returns: Percentage of completed Focuses(Goal or Task) per month
+  private func percentageOfMonthlyCompletedFocuses(data: [Focus], type: String) -> [Double] {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = Constant.monthShortDateFormat
     var lastMonth = ""
     if let data = data.first { lastMonth = dateFormatter.string(from: (data.date)!) }
     var total = 0
@@ -121,6 +147,17 @@ class Progress {
     return focuses
   }
   
+  /** Create a dictionary of data.
+  - Parameters:
+    - months: Array of labels (short month symbols)
+    - goals: Array containing percentage of completed goals
+    - tasks: Array containing percentage of completed tasks
+  - Returns: Dictionary of percentages of completed Goals and Tasks per Week
+    - Key: Label representing the month (e.g "Jan")
+    - Value: Array containing percentage of completed focuses:
+      - First: Goal
+      - Last: Task
+  */
   private func dataStructureForMonthlyCompletedFocuses(months: [String], goals: [Double], tasks: [Double]) -> [String:[Double]] {
     var results = [String:[Double]]()
     _labels = Calendar.current.shortMonthSymbols.reversed()
@@ -183,6 +220,14 @@ class Progress {
     return (start, end)
   }
   
+  /** Return percentage of completed Focuses (Goal or Task) per week
+  - Parameters:
+    - data: Array of all Focuses
+    - type: Type of Focus (goal or task) to analyze
+  - Returns: percentage of completed Focuses(Goal or Task) per week:
+    - Key: Numerical representation of week
+    - Value: Percentage
+  */
   private func percentageOfWeeklyCompletedFocuses(data: [Focus], type: String) -> [Int:Double] {
     var focuses: [Int:Double] = [:]
     var lastWeek = 0
@@ -227,6 +272,16 @@ class Progress {
     return Int(ceil(day/7.0))
   }
   
+  /** Create a dictionary of data.
+  - Parameters:
+    - goals: Percentages of completed goals per Week
+    - tasks: Percentages of completed tasks per Month
+  - Returns: Dictionary of percentages of completed Goals and Tasks per Week
+    - Key: Label representing the week (e.g "Week 0")
+    - Value: Array containing percentage of completed focuses:
+      - First: Goal
+      - Last: Task
+  */
   private func dataStructureForWeeklyCompletedFocuses(goals: [Int:Double], tasks: [Int:Double]) -> [String:[Double]] {
     var results = self.initResultsAndUpdateLabels()
     // Update with the data from Goals and Tasks

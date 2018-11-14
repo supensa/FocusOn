@@ -49,6 +49,9 @@ class DataController {
     }
   }
   
+  /// Make sure context changed before saving
+  ///
+  /// - Throws: Exception if context could not save
   func saveContext() throws {
     if context.hasChanges {
       return try self.context.save()
@@ -61,8 +64,10 @@ class DataController {
 extension DataController {
   /// Create a predicate for a specific date
   ///
-  /// - Parameter date: Specific date
-  /// - Returns: compound predicate
+  /// - Parameters:
+  ///   - date: Beginning date
+  ///   - endDate: Ending date
+  /// - Returns: Compound predicate
   func datePredicate(from date: Date = Date(), to endDate: Date? = nil) -> NSCompoundPredicate {
     // Get the current calendar with local time zone
     var calendar = Calendar.current

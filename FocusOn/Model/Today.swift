@@ -62,14 +62,24 @@ class Today {
     return isFromLastDay
   }
   
+  /// Return task's title
+  /// - Parameter order: Identify the task (from 0 to 2)
+  /// - Returns: Returns the title or nil if the task does not exist
   func taskTitle(order: Int) -> String? {
     return tasks[order]?.title
   }
   
+  /// Check whether the task is completed
+  /// - Parameter order: Identify the task (from 0 to 2)
+  /// - Returns: True only if it exists and is completed
   func isCompletedTask(order: Int) -> Bool {
     return tasks[order]?.isCompleted ?? false
   }
   
+  /// Set completion status of goal
+  /// - Parameters:
+  ///   - isSelected: True to set as "selected"
+  ///   - errorHandler: Errorhandler in case the context cannot save the changes
   func goal(isSelected: Bool, errorHandler: (()->())? = nil) {
     goal?.isCompleted = isSelected
     if isSelected {
@@ -81,6 +91,11 @@ class Today {
     }
   }
   
+  /// Set completion status of task
+  /// - Parameters:
+  ///   - isSelected: True to set as "selected"
+  ///   - index: Identify the task (from 0 to 2)
+  ///   - errorHandler: Errorhandler in case the context cannot save the changes
   func task(isSelected: Bool, index: Int, errorHandler: (()->())? = nil) {
     tasks[index]?.isCompleted = isSelected
     if !isSelected {
@@ -91,11 +106,15 @@ class Today {
     save(errorHandler)
   }
   
+  
+  /// Reset the model data in memory
   func resetData() {
     goal = nil
     tasks.removeAll()
   }
   
+  /// Delete the in memory goal and its tasks from persistence store and from memory
+  /// - Parameter errorHandler: Errorhandler in case the context cannot save the changes
   func deleteAll(errorHandler: (()->())? = nil){
     guard goal != nil || tasks.count > 0
       else { return }
@@ -109,11 +128,19 @@ class Today {
     save(errorHandler)
   }
   
+  /// Update to today's date the in memory goal and its tasks
+  /// - Parameter errorHandler: Errorhandler in case the context cannot save the changes
   func updateDates(errorHandler: (()->())? = nil) {
     let date = Date()
     updateAll(date: date, type: nil, title: nil, order: nil, isCompleted: nil, errorHandler: errorHandler)
   }
   
+  /// Remove or update a specific Focus
+  /// - Parameters:
+  ///   - title: if title is nil delete the focus otherwise update its title and date
+  ///   - order: Identify the task (from 0 to 2)
+  ///   - type: Goal or Task
+  ///   - errorHandler: Errorhandler in case the context cannot save the changes
   func processData(title: String, order: Int, type: Type, errorHandler: (()->())? = nil) {
     if title == "" {
       processDataRemoval(type: type, order: order, errorHandler: errorHandler)
@@ -122,6 +149,11 @@ class Today {
     }
   }
   
+  /// Delete a sepcific in memory task or all in memory focuses if goal is deleted
+  /// - Parameters:
+  ///   - type: Goal or Task
+  ///   - order: Identify the task (from 0 to 2)
+  ///   - errorHandler: Errorhandler in case the context cannot save the changes
   private func processDataRemoval(type: Type, order: Int, errorHandler: (()->())? = nil) {
     if type == .goal {
       deleteAll()
@@ -132,6 +164,16 @@ class Today {
     }
   }
   
+  /// Update all in memory Focuses in to persistent store.
+  ///
+  /// Only update not nil parameters. Date update is mandatory.
+  /// - Parameters:
+  ///   - date: New date
+  ///   - type: New type
+  ///   - title: New title
+  ///   - order: New order (index mainly for tasks)
+  ///   - isCompleted: True if completed
+  ///   - errorHandler: Errorhandler in case the context cannot save the changes
   private func updateAll(date: Date, type: Type? = nil , title: String? = nil,
                  order: Int? = nil, isCompleted: Bool? = nil, errorHandler: (()->())? = nil){
     if goal != nil {
@@ -148,7 +190,8 @@ class Today {
   ///   - focus: focus to update
   ///   - date: date of update
   ///   - type: type of focus (goal or task)
-  ///   - text: title of focus
+  ///   - title: title of focus
+  ///   - order: index mainly to identify tasks
   ///   - isCompleted: completion of focus
   ///   - errorHandler: closure in case saving with CoreData fails
   private func update(focus: Focus, date: Date?, type: Type? = nil , title: String? = nil,
@@ -171,10 +214,11 @@ class Today {
     save(errorHandler)
   }
   
-  /// Only remove this focus if it is a task.
-  /// Otherwise, remove all focuses for today
-  ///
-  /// - Parameter focus: focus to be removed
+  /// Remove focus from persistent store.
+  /// - Parameters:
+  ///     - focus: focus to be removed
+  ///     - order: index mainly to identify tasks
+  ///     - errorHandler: closure in case saving with CoreData fails
   private func delete(focus: Focus, order: Int, errorHandler: (()->())? = nil) {
     dataController.context.delete(focus)
     if focus.type == Type.goal.rawValue { goal = nil }
@@ -190,6 +234,7 @@ class Today {
   ///   - type: type of focus (goal or task)
   ///   - title: title of focus
   ///   - order: order of task
+  ///   - errorHandler: closure in case saving with CoreData fails
   private func processDataUpdate(type: Type, title: String, order: Int, errorHandler: (()->())? = nil) {
     if type == .task && goal == nil { return }
     var focus: Focus
@@ -236,7 +281,7 @@ class Today {
   /// Request a goal and its tasks for a specifice date
   ///
   /// - Parameter date: goal and tasks associated date
-  /// - Returns: goal and tasks if any
+  /// - Returns: NSFetchedResultsController containing goal and its tasks
   private func fetchResultsController(date: Date) -> NSFetchedResultsController<Focus> {
     let fetchRequest: NSFetchRequest<Focus> = Focus.fetchRequest()
     let typeSortDescriptor = NSSortDescriptor(key: "type", ascending: false)
@@ -252,7 +297,7 @@ class Today {
     return fetchedResultsController
   }
   
-  /// Request the last unachieved Goal
+  /// Request the last uncompleted Goal
   ///
   /// - Returns: last uncompleted goal if any
   private func requestLastUncompletedGoal() -> Focus? {

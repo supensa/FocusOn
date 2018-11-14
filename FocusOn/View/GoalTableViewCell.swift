@@ -17,7 +17,6 @@ class GoalTableViewCell: TableViewCell {
   override func awakeFromNib() {
     self.textView = title
     self.label = checkmarkLabel
-    self.label.font = label.font.withSize(30)
     super.awakeFromNib()
     placeHolderText = Constant.goalPlaceHolder
   }

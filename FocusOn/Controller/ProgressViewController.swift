@@ -79,6 +79,9 @@ class ProgressViewController: ViewController {
     self.loadDataInGraph()
   }
   
+  /// Setup horizontal barchart accordingly to the data
+  ///
+  /// - Parameter isEmpty: if graph should be empty
   private func loadDataInGraph(isEmpty: Bool = false) {
     let index = isEmpty ? -1 : self.segmentControl.selectedSegmentIndex
     switch index {
@@ -105,6 +108,7 @@ class ProgressViewController: ViewController {
     setChart()
   }
   
+  // Load or remove data
   private func setChart() {
     if completedGoals.isEmpty && completedTasks.isEmpty {
       barChartView.data = nil
@@ -115,7 +119,7 @@ class ProgressViewController: ViewController {
       barChartView.notifyDataSetChanged()
     }
   }
-  
+  // Setup bars
   private func updateBarChartData() {
     let chartData = BarChartData(dataSets: [taskDataSet, goalDataSet])
     chartData.setValueFormatter(Formatter())
@@ -133,7 +137,7 @@ class ProgressViewController: ViewController {
     chartData.groupBars(fromX: Double(startYear), groupSpace: groupSpace, barSpace: barSpace)
     barChartView.data = chartData
   }
-  
+  // Setup legend, grid and data
   private func updateDataSet() {
     var goalDataEntries: [BarChartDataEntry] = []
     var taskDataEntries: [BarChartDataEntry] = []
