@@ -14,7 +14,7 @@ class History {
   init(_ dataController: DataController) {
     self.dataController = dataController
   }
-  /// Request all the Goals and their tasks sorted by time in descending order and grouped by date.
+  /// Request all the Goals and their tasks sorted and group by date in descending order.
   /// - Returns: NSFetchedResultsController containing all the focuses
   func historyFetchResultsController() -> NSFetchedResultsController<Focus> {
     let fetchRequest: NSFetchRequest<Focus> = Focus.fetchRequest()

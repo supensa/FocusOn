@@ -9,6 +9,7 @@
 import UIKit
 
 extension UIView {
+  /// Look into subviews to find the first responder
   var firstResponder: UIView? {
     guard !isFirstResponder else { return self }
     

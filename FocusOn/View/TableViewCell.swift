@@ -25,15 +25,22 @@ class TableViewCell: UITableViewCell {
     setPlaceHolder()
   }
   
+  /// Put a place holder into the cell's textView
   func setPlaceHolder() {
     textView.textColor = Constant.placeHolderColor
     textView.text = placeHolderText
   }
   
+  /// Check if place holder is set into the cell's textView
+  ///
+  /// - Returns: True if the placeholder is set
   func isPlaceHolderSet() -> Bool {
     return textView.text == placeHolderText
   }
   
+  /// Add or remove checkmark in the cell
+  ///
+  /// - Parameter bool: True to set the checkmark
   func setCheckmark(_ bool: Bool) {
     label.text = bool ? Constant.checkmark : ""
   }
@@ -54,6 +61,7 @@ class TableViewCell: UITableViewCell {
 // -------------------------------------------------------------------------
 // MARK: - Text view delegate
 extension TableViewCell: UITextViewDelegate {
+  // Remove placeholder when textView starts to be edited
   func textViewDidBeginEditing(_ textView: UITextView) {
     if textView.text == placeHolderText {
       textView.text = ""
@@ -63,6 +71,8 @@ extension TableViewCell: UITextViewDelegate {
     delegate?.dynamicSize(cell: self)
   }
   
+  // Set placeHolder when textView is empty
+  // Call delegation method to notify that the textView did finish editing
   func textViewDidEndEditing(_ textView: UITextView) {
     textView.text = textView.text?.trimmingCharacters(in: .whitespacesAndNewlines)
     clearCheckMarkIfNeeded()
@@ -73,6 +83,8 @@ extension TableViewCell: UITextViewDelegate {
     }
   }
   
+  // Dynamically change the size of the textView
+  // when text changes.
   func textViewDidChange(_ textView: UITextView) {
     clearCheckMarkIfNeeded()
     delegate?.dynamicSize(cell: self)

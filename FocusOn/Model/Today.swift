@@ -128,16 +128,18 @@ class Today {
     save(errorHandler)
   }
   
-  /// Update to today's date the in memory goal and its tasks
+  /// Update to today's date for the in memory goal and its tasks
   /// - Parameter errorHandler: Errorhandler in case the context cannot save the changes
   func updateDates(errorHandler: (()->())? = nil) {
     let date = Date()
     updateAll(date: date, type: nil, title: nil, order: nil, isCompleted: nil, errorHandler: errorHandler)
   }
   
-  /// Remove or update a specific Focus
+  /// Remove or update a specific Focus.
+  ///
+  /// If title is nil delete the focus otherwise update its title and date.
   /// - Parameters:
-  ///   - title: if title is nil delete the focus otherwise update its title and date
+  ///   - title: Focus'title
   ///   - order: Identify the task (from 0 to 2)
   ///   - type: Goal or Task
   ///   - errorHandler: Errorhandler in case the context cannot save the changes
@@ -149,7 +151,7 @@ class Today {
     }
   }
   
-  /// Delete a sepcific in memory task or all in memory focuses if goal is deleted
+  /// Delete a sepcific in memory task. Delete all in memory focuses if goal is deleted
   /// - Parameters:
   ///   - type: Goal or Task
   ///   - order: Identify the task (from 0 to 2)
@@ -164,7 +166,7 @@ class Today {
     }
   }
   
-  /// Update all in memory Focuses in to persistent store.
+  /// Update all in memory Focuses and save them into persistent store.
   ///
   /// Only update not nil parameters. Date update is mandatory.
   /// - Parameters:
@@ -184,7 +186,7 @@ class Today {
     }
   }
   
-  /// Update this focus
+  /// Update this focus into persistent store
   ///
   /// - Parameters:
   ///   - focus: focus to update

@@ -11,7 +11,6 @@
 		59051378215BBA6C0090AB1A /* TableViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59051377215BBA6C0090AB1A /* TableViewCellDelegate.swift */; };
 		591A6E52215F063E00D26793 /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591A6E51215F063E00D26793 /* UIView+Extension.swift */; };
 		591A6E54216166E600D26793 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591A6E53216166E600D26793 /* TableViewCell.swift */; };
-		591A6E5821630EA000D26793 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591A6E5721630EA000D26793 /* UIColor+Extension.swift */; };
 		591A6E5A2166C97600D26793 /* HistoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591A6E592166C97600D26793 /* HistoryTableViewCell.swift */; };
 		592BEF7D216927670007FA83 /* ScrollDirectionEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592BEF7C216927670007FA83 /* ScrollDirectionEnum.swift */; };
 		5949FF232157F04C0029E984 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5949FF222157F04C0029E984 /* TabBarController.swift */; };
@@ -22,6 +21,7 @@
 		5949FF2E215832D60029E984 /* ProgressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5949FF2D215832D60029E984 /* ProgressViewController.swift */; };
 		5949FF30215832F20029E984 /* HistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5949FF2F215832F20029E984 /* HistoryViewController.swift */; };
 		5949FF322158441D0029E984 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5949FF312158441D0029E984 /* ViewController.swift */; };
+		597ADEA3219D1A68008250A3 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 597ADEA2219D1A68008250A3 /* UIColor+Extension.swift */; };
 		5995E8B42158532C002762D2 /* GoalTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5995E8B32158532C002762D2 /* GoalTableViewCell.swift */; };
 		5995E8B621585339002762D2 /* TaskTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5995E8B521585339002762D2 /* TaskTableViewCell.swift */; };
 		59C4114D2159382E00FEB9D2 /* TypeEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C4114C2159382E00FEB9D2 /* TypeEnum.swift */; };
@@ -94,7 +94,6 @@
 		59051377215BBA6C0090AB1A /* TableViewCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCellDelegate.swift; sourceTree = "<group>"; };
 		591A6E51215F063E00D26793 /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
 		591A6E53216166E600D26793 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
-		591A6E5721630EA000D26793 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		591A6E592166C97600D26793 /* HistoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTableViewCell.swift; sourceTree = "<group>"; };
 		592BEF7C216927670007FA83 /* ScrollDirectionEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollDirectionEnum.swift; sourceTree = "<group>"; };
 		5949FF222157F04C0029E984 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
@@ -106,6 +105,7 @@
 		5949FF2F215832F20029E984 /* HistoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewController.swift; sourceTree = "<group>"; };
 		5949FF312158441D0029E984 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		59709D6A216D3E8600575226 /* Charts.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Charts.xcodeproj; path = Charts/Charts.xcodeproj; sourceTree = "<group>"; };
+		597ADEA2219D1A68008250A3 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		5995E8B32158532C002762D2 /* GoalTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalTableViewCell.swift; sourceTree = "<group>"; };
 		5995E8B521585339002762D2 /* TaskTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTableViewCell.swift; sourceTree = "<group>"; };
 		59C4114C2159382E00FEB9D2 /* TypeEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypeEnum.swift; sourceTree = "<group>"; };
@@ -173,7 +173,7 @@
 		5949FF202157EF6B0029E984 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				591A6E5721630EA000D26793 /* UIColor+Extension.swift */,
+				597ADEA2219D1A68008250A3 /* UIColor+Extension.swift */,
 				591A6E51215F063E00D26793 /* UIView+Extension.swift */,
 				59C715ED217AADFE00308279 /* UITableView+Extension.swift */,
 				59FDBD3C2157D38100A9AA1F /* LaunchScreen.storyboard */,
@@ -427,7 +427,6 @@
 				59001CA12185E22700CDFAF8 /* DummyData.swift in Sources */,
 				5949FF232157F04C0029E984 /* TabBarController.swift in Sources */,
 				59051378215BBA6C0090AB1A /* TableViewCellDelegate.swift in Sources */,
-				591A6E5821630EA000D26793 /* UIColor+Extension.swift in Sources */,
 				5949FF322158441D0029E984 /* ViewController.swift in Sources */,
 				59C4114D2159382E00FEB9D2 /* TypeEnum.swift in Sources */,
 				5949FF262157F97A0029E984 /* Datamodel.xcdatamodeld in Sources */,
@@ -435,6 +434,7 @@
 				5949FF2E215832D60029E984 /* ProgressViewController.swift in Sources */,
 				591A6E52215F063E00D26793 /* UIView+Extension.swift in Sources */,
 				5995E8B42158532C002762D2 /* GoalTableViewCell.swift in Sources */,
+				597ADEA3219D1A68008250A3 /* UIColor+Extension.swift in Sources */,
 				592BEF7D216927670007FA83 /* ScrollDirectionEnum.swift in Sources */,
 				59FDBD362157D37F00A9AA1F /* TodayViewController.swift in Sources */,
 				5949FF2C215800750029E984 /* PersistentContainer.swift in Sources */,
