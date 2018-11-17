@@ -35,7 +35,7 @@ class TodayTests: XCTestCase {
     self.focuses = [Focus]()
   }
   
-  func testGivenCreatingNeWFocus_WhenSavingContext_ThenNoError() {
+  func testGivenCreatingNewFocus_WhenSavingContext_ThenNoError() {
     _ = createFocus()
     saveContext()
   }
@@ -98,23 +98,6 @@ class TodayTests: XCTestCase {
     XCTAssertEqual(isFromLastDay, false)
   }
   
-  func testGivenToday_WhenUserRefusesLastUncompletedGoalToLoadForToday_ThenDataReset() {
-    dataForToday()
-    let today = Today(dataController)
-    _ = today.loadData()
-    XCTAssertEqual(today.goalTitle, "TODAY")
-    XCTAssertEqual(today.uncompletedTasksCount, 2)
-    XCTAssertEqual(today.areAllTasksCompleted, false)
-    today.resetData()
-    var isThereAnyTask = self.isThereAnyTask(today: today)
-    XCTAssertEqual(isThereAnyTask, false)
-    XCTAssertEqual(today.goalTitle, nil)
-    _ = today.loadData()
-    isThereAnyTask = self.isThereAnyTask(today: today)
-    XCTAssertEqual(isThereAnyTask, true)
-    XCTAssertEqual(today.goalTitle, "TODAY")
-  }
-  
   func testGivenToday_WhenUserDeleteTodayFocuses_ThenRemoved() {
     dataForToday()
     let today = Today(dataController)
@@ -133,6 +116,7 @@ class TodayTests: XCTestCase {
   }
   
   func testGivenToday_WhenLoadData_ThenGetTodayGoalsTasks() {
+    dataForToday(isFromLastDay: true)
     dataForToday()
     let today = Today(dataController)
     let isFromLastDay = today.loadData()

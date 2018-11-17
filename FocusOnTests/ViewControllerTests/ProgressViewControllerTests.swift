@@ -35,7 +35,7 @@ class ProgressViewControllerTests: XCTestCase {
     self.focuses = [Focus]()
   }
   
-  func testGivenProgressViewDidLoad_WhenProgressViewWillAppear_thenDataEmpty() {
+  func testGivenProgressViewDidLoad_WhenProgressViewWillAppear_thenDataNotEmpty() {
     dataForCurrentMonth()
     dataForCurrentYear()
     

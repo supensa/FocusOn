@@ -16,11 +16,10 @@ class TableViewCellTests: XCTestCase {
     let textView = UITextView()
     cell.textView = textView
     cell.awakeFromNib()
-    XCTAssertEqual(cell.textView.isUserInteractionEnabled, false)
     XCTAssertEqual(cell.textView.isScrollEnabled, false)
   }
   
-  func testGivenTableViewCellDidLoad_WhentextViewDidChange_ThenTextNil() {
+  func testGivenTableViewCellDidLoad_WhentextViewDidChange_ThenLabelIsEmpty() {
     let cell = TableViewCell(frame: .zero)
     let textView = UITextView(frame: .zero)
     let label = UILabel(frame: .zero)
@@ -36,7 +35,7 @@ class TableViewCellTests: XCTestCase {
     XCTAssertEqual(cell.label.text, "")
   }
   
-  func testGivenTableViewCellDidLoad_WhenTextViewDidEndEditing_ThenTextNil() {
+  func testGivenTableViewCellDidLoad_WhenTextViewDidEndEditing_ThenTextHasPlaceHolder() {
     let cell = TableViewCell(frame: .zero)
     let textView = UITextView(frame: .zero)
     let label = UILabel(frame: .zero)
@@ -58,9 +57,9 @@ class TableViewCellTests: XCTestCase {
     cell.textView = textView
     cell.label = label
     cell.awakeFromNib()
+    cell.textView.text = "TEST"
     cell.textViewDidBeginEditing(cell.textView)
-    XCTAssertEqual(cell.textView.text, "")
-    XCTAssertEqual(cell.formerText, "")
+    XCTAssertEqual(cell.formerText, "TEST")
   }
   
   func testGivenTableViewCellDidLoad_WhenSetCheckMark_ThenTextLabelUpdates() {
@@ -76,7 +75,7 @@ class TableViewCellTests: XCTestCase {
     XCTAssertEqual(cell.label.text, Constant.checkmark)
   }
   
-  func testGivenTableViewCellDidLoad_WhenCheckPlaceHolder_ThenPlaceHolderChecked() {
+  func testGivenTableViewCellDidLoad_WhenSetPlaceHolder_ThenPlaceHolderIsSet() {
     let cell = TableViewCell(frame: .zero)
     let textView = UITextView(frame: .zero)
     let label = UILabel(frame: .zero)
