@@ -91,7 +91,6 @@ class TodayViewController: ViewController {
       popoverController.sourceRect = CGRect(x: self.tableView.bounds.midX, y: self.tableView.bounds.maxY - 5, width: 0, height: 0)
       popoverController.permittedArrowDirections = [UIPopoverArrowDirection.down]
     }
-    
     show(alertController)
   }
   
