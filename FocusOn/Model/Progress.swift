@@ -203,7 +203,16 @@ class Progress {
     let year = calendar.component(.year, from: today)
     // Begining and End date represented as string
     let startTime = isMonthly ? Constant.monthlyDateFormat(year: year) : Constant.weeklyDateFormat(year: year, month: month)
-    let endTime = isMonthly ? Constant.monthlyDateFormat(year: year + 1) : Constant.weeklyDateFormat(year: year, month: month + 1)
+    var endTime = ""
+    if isMonthly {
+      endTime = Constant.monthlyDateFormat(year: year + 1)
+    } else {
+      if month < 12 {
+        endTime = Constant.weeklyDateFormat(year: year , month: month + 1)
+      } else {
+        endTime = Constant.weeklyDateFormat(year: year + 1, month: 1)
+      }
+    }
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = Constant.defaultDateFormat
     dateFormatter.timeZone = TimeZone.current
