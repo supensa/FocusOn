@@ -27,7 +27,7 @@ class TabBarController: UITabBarController {
     let identifier = Constant.notificationIdentifier
     let notificationCenter = UNUserNotificationCenter.current()
     // remove previously scheduled notifications
-    notificationCenter.removeDeliveredNotifications(withIdentifiers: [identifier])
+    notificationCenter.removePendingNotificationRequests(withIdentifiers: [identifier])
     if let newTitle = title, let newBody = body {
       // create content
       let content = UNMutableNotificationContent()

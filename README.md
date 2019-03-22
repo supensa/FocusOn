@@ -7,6 +7,13 @@ This application has three tabs:
 2. Today
 3. Progress
 
+## Notification:
+The application will send a notification 4 hours after the user's last visit to remind him/her to check his/her goal.
+
+<p align="center">
+<img src="Images/notification.png" width="300">
+</p><br/>
+
 ## History:
 List the goals per day with their corresponding tasks.
 The user can see whether the goals/tasks are completed.
