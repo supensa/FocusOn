@@ -13,6 +13,8 @@
 		591A6E54216166E600D26793 /* TableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591A6E53216166E600D26793 /* TableViewCell.swift */; };
 		591A6E5A2166C97600D26793 /* HistoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 591A6E592166C97600D26793 /* HistoryTableViewCell.swift */; };
 		592BEF7D216927670007FA83 /* ScrollDirectionEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592BEF7C216927670007FA83 /* ScrollDirectionEnum.swift */; };
+		59304BAC230EF97E0006664D /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 59304BA9230EF9760006664D /* Charts.framework */; };
+		59304BAD230EF97E0006664D /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 59304BA9230EF9760006664D /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5949FF232157F04C0029E984 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5949FF222157F04C0029E984 /* TabBarController.swift */; };
 		5949FF262157F97A0029E984 /* Datamodel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5949FF242157F97A0029E984 /* Datamodel.xcdatamodeld */; };
 		5949FF282157F9B20029E984 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5949FF272157F9B20029E984 /* DataController.swift */; };
@@ -46,8 +48,6 @@
 		59E9B7FC2244363300A306B5 /* notification.png in Resources */ = {isa = PBXBuildFile; fileRef = 59E9B7F22244363200A306B5 /* notification.png */; };
 		59E9B7FD2244363300A306B5 /* focuson1.png in Resources */ = {isa = PBXBuildFile; fileRef = 59E9B7F32244363200A306B5 /* focuson1.png */; };
 		59E9B7FE2244363300A306B5 /* focuson2.png in Resources */ = {isa = PBXBuildFile; fileRef = 59E9B7F42244363200A306B5 /* focuson2.png */; };
-		59EB0234218C850300A00C05 /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 59709D70216D3E8700575226 /* Charts.framework */; };
-		59EB0235218C850300A00C05 /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 59709D70216D3E8700575226 /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		59FDBD342157D37F00A9AA1F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59FDBD332157D37F00A9AA1F /* AppDelegate.swift */; };
 		59FDBD362157D37F00A9AA1F /* TodayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59FDBD352157D37F00A9AA1F /* TodayViewController.swift */; };
 		59FDBD392157D37F00A9AA1F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 59FDBD372157D37F00A9AA1F /* Main.storyboard */; };
@@ -56,19 +56,26 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		59709D6F216D3E8700575226 /* PBXContainerItemProxy */ = {
+		59304BA8230EF9760006664D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 59709D6A216D3E8600575226 /* Charts.xcodeproj */;
+			containerPortal = 59304BA3230EF9760006664D /* Charts.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 65AD9E95D9ED4DC0BD73A743;
 			remoteInfo = Charts;
 		};
-		59709D71216D3E8700575226 /* PBXContainerItemProxy */ = {
+		59304BAA230EF9760006664D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 59709D6A216D3E8600575226 /* Charts.xcodeproj */;
+			containerPortal = 59304BA3230EF9760006664D /* Charts.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 1CBBC58C6CE1EBEE9852CE41;
 			remoteInfo = ChartsTests;
+		};
+		59304BAE230EF97E0006664D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 59304BA3230EF9760006664D /* Charts.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = A58A4ED274A941CA248EA921;
+			remoteInfo = Charts;
 		};
 		59D09C46217E816C00489673 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -77,23 +84,16 @@
 			remoteGlobalIDString = 59FDBD2F2157D37F00A9AA1F;
 			remoteInfo = FocusOn;
 		};
-		59EB0236218C850300A00C05 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 59709D6A216D3E8600575226 /* Charts.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = A58A4ED274A941CA248EA921;
-			remoteInfo = Charts;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		59EB0238218C850400A00C05 /* Embed Frameworks */ = {
+		59304BB0230EF97E0006664D /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				59EB0235218C850300A00C05 /* Charts.framework in Embed Frameworks */,
+				59304BAD230EF97E0006664D /* Charts.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -107,6 +107,7 @@
 		591A6E53216166E600D26793 /* TableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewCell.swift; sourceTree = "<group>"; };
 		591A6E592166C97600D26793 /* HistoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTableViewCell.swift; sourceTree = "<group>"; };
 		592BEF7C216927670007FA83 /* ScrollDirectionEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollDirectionEnum.swift; sourceTree = "<group>"; };
+		59304BA3230EF9760006664D /* Charts.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Charts.xcodeproj; path = Charts/Charts.xcodeproj; sourceTree = "<group>"; };
 		5949FF222157F04C0029E984 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		5949FF252157F97A0029E984 /* Datamodel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Datamodel.xcdatamodel; sourceTree = "<group>"; };
 		5949FF272157F9B20029E984 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
@@ -115,7 +116,6 @@
 		5949FF2D215832D60029E984 /* ProgressViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewController.swift; sourceTree = "<group>"; };
 		5949FF2F215832F20029E984 /* HistoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewController.swift; sourceTree = "<group>"; };
 		5949FF312158441D0029E984 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		59709D6A216D3E8600575226 /* Charts.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Charts.xcodeproj; path = Charts/Charts.xcodeproj; sourceTree = "<group>"; };
 		597ADEA2219D1A68008250A3 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		5995E8B32158532C002762D2 /* GoalTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalTableViewCell.swift; sourceTree = "<group>"; };
 		5995E8B521585339002762D2 /* TaskTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTableViewCell.swift; sourceTree = "<group>"; };
@@ -164,7 +164,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				59EB0234218C850300A00C05 /* Charts.framework in Frameworks */,
+				59304BAC230EF97E0006664D /* Charts.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -177,6 +177,15 @@
 				59001CA02185E22700CDFAF8 /* DummyData.swift */,
 			);
 			path = DummyData;
+			sourceTree = "<group>";
+		};
+		59304BA4230EF9760006664D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				59304BA9230EF9760006664D /* Charts.framework */,
+				59304BAB230EF9760006664D /* ChartsTests.xctest */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		5949FF1F2157EF590029E984 /* Controller */ = {
@@ -221,15 +230,6 @@
 				59C715DA2178F42500308279 /* History.swift */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		59709D6B216D3E8600575226 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				59709D70216D3E8700575226 /* Charts.framework */,
-				59709D72216D3E8700575226 /* ChartsTests.xctest */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		59D09C42217E816B00489673 /* FocusOnTests */ = {
@@ -290,7 +290,7 @@
 		59FDBD272157D37F00A9AA1F = {
 			isa = PBXGroup;
 			children = (
-				59709D6A216D3E8600575226 /* Charts.xcodeproj */,
+				59304BA3230EF9760006664D /* Charts.xcodeproj */,
 				59FDBD322157D37F00A9AA1F /* FocusOn */,
 				59D09C42217E816B00489673 /* FocusOnTests */,
 				59FDBD312157D37F00A9AA1F /* Products */,
@@ -351,12 +351,12 @@
 				59FDBD2C2157D37F00A9AA1F /* Sources */,
 				59FDBD2D2157D37F00A9AA1F /* Frameworks */,
 				59FDBD2E2157D37F00A9AA1F /* Resources */,
-				59EB0238218C850400A00C05 /* Embed Frameworks */,
+				59304BB0230EF97E0006664D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				59EB0237218C850300A00C05 /* PBXTargetDependency */,
+				59304BAF230EF97E0006664D /* PBXTargetDependency */,
 			);
 			name = FocusOn;
 			productName = FocusOn;
@@ -395,8 +395,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 59709D6B216D3E8600575226 /* Products */;
-					ProjectRef = 59709D6A216D3E8600575226 /* Charts.xcodeproj */;
+					ProductGroup = 59304BA4230EF9760006664D /* Products */;
+					ProjectRef = 59304BA3230EF9760006664D /* Charts.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -408,18 +408,18 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		59709D70216D3E8700575226 /* Charts.framework */ = {
+		59304BA9230EF9760006664D /* Charts.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = Charts.framework;
-			remoteRef = 59709D6F216D3E8700575226 /* PBXContainerItemProxy */;
+			remoteRef = 59304BA8230EF9760006664D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		59709D72216D3E8700575226 /* ChartsTests.xctest */ = {
+		59304BAB230EF9760006664D /* ChartsTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
 			path = ChartsTests.xctest;
-			remoteRef = 59709D71216D3E8700575226 /* PBXContainerItemProxy */;
+			remoteRef = 59304BAA230EF9760006664D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -503,15 +503,15 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		59304BAF230EF97E0006664D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Charts;
+			targetProxy = 59304BAE230EF97E0006664D /* PBXContainerItemProxy */;
+		};
 		59D09C47217E816C00489673 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 59FDBD2F2157D37F00A9AA1F /* FocusOn */;
 			targetProxy = 59D09C46217E816C00489673 /* PBXContainerItemProxy */;
-		};
-		59EB0237218C850300A00C05 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Charts;
-			targetProxy = 59EB0236218C850300A00C05 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -540,7 +540,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = HT9N5JEKMU;
+				DEVELOPMENT_TEAM = VKJGV2D92P;
 				INFOPLIST_FILE = FocusOnTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -560,7 +560,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = HT9N5JEKMU;
+				DEVELOPMENT_TEAM = VKJGV2D92P;
 				INFOPLIST_FILE = FocusOnTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -698,7 +698,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = HT9N5JEKMU;
+				DEVELOPMENT_TEAM = VKJGV2D92P;
 				INFOPLIST_FILE = FocusOn/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -720,7 +720,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = HT9N5JEKMU;
+				DEVELOPMENT_TEAM = VKJGV2D92P;
 				INFOPLIST_FILE = FocusOn/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
