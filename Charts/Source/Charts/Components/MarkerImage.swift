@@ -12,12 +12,8 @@
 import Foundation
 import CoreGraphics
 
-#if !os(OSX)
-    import UIKit
-#endif
-
 @objc(ChartMarkerImage)
-open class MarkerImage: NSObject, IMarker
+open class MarkerImage: NSObject, Marker
 {
     /// The marker image to render
     @objc open var image: NSUIImage?

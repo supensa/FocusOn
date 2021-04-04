@@ -7,6 +7,9 @@ This application has three tabs:
 2. Today
 3. Progress
 
+## Contact:
+If you have any questions contact me at <a href="mailto:spencer.forrest.ios@gmail.com">spencer.forrest.ios@gmail.com</a>
+
 ## Notification:
 The application will send a notification 4 hours after the user's last visit to remind him/her to check his/her goal.
 

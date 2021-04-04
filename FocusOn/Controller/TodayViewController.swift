@@ -26,7 +26,6 @@ class TodayViewController: ViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     model = Today(self.dataController)
-//    DummyData.generate(context: dataController.context)
     isFromLastDay = model.loadData()
     tableViewDelegation()
     hideKeyboardWhenTappedAround()

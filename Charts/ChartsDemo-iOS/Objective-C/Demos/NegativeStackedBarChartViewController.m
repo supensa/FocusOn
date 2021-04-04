@@ -12,7 +12,7 @@
 #import "NegativeStackedBarChartViewController.h"
 #import "ChartsDemo_iOS-Swift.h"
 
-@interface NegativeStackedBarChartViewController () <ChartViewDelegate, IChartAxisValueFormatter>
+@interface NegativeStackedBarChartViewController () <ChartViewDelegate, ChartAxisValueFormatter>
 
 @property (nonatomic, strong) IBOutlet HorizontalBarChartView *chartView;
 
@@ -124,7 +124,7 @@
     if (_chartView.data.dataSetCount > 0)
     {
         set = (BarChartDataSet *)_chartView.data.dataSets[0];
-        set.values = yValues;
+        [set replaceEntries: yValues];
         [_chartView.data notifyDataChanged];
         [_chartView notifyDataSetChanged];
     }
@@ -137,7 +137,7 @@
         customFormatter.minimumSignificantDigits = 1;
         customFormatter.minimumFractionDigits = 1;
         
-        set = [[BarChartDataSet alloc] initWithValues:yValues label:@"Age Distribution"];
+        set = [[BarChartDataSet alloc] initWithEntries:yValues label:@"Age Distribution"];
         
         set.drawIconsEnabled = NO;
         
@@ -184,7 +184,7 @@
     NSLog(@"chartValueNothingSelected");
 }
 
-#pragma mark - IAxisValueFormatter
+#pragma mark - AxisValueFormatter
 
 - (NSString *)stringForValue:(double)value
                         axis:(ChartAxisBase *)axis

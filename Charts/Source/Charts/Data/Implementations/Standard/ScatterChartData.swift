@@ -14,35 +14,26 @@ import CoreGraphics
 
 open class ScatterChartData: BarLineScatterCandleBubbleChartData
 {
-    public override init()
+    public required init()
     {
         super.init()
     }
     
-    public override init(dataSets: [IChartDataSet]?)
+    public override init(dataSets: [ChartDataSetProtocol])
     {
         super.init(dataSets: dataSets)
     }
+
+    public required init(arrayLiteral elements: ChartDataSetProtocol...)
+    {
+        super.init(dataSets: elements)
+    }
     
-    /// - returns: The maximum shape-size across all DataSets.
+    /// - Returns: The maximum shape-size across all DataSets.
     @objc open func getGreatestShapeSize() -> CGFloat
     {
-        var max = CGFloat(0.0)
-        
-        for set in _dataSets
-        {
-            let scatterDataSet = set as? IScatterChartDataSet
-            
-            if scatterDataSet == nil
-            {
-                print("ScatterChartData: Found a DataSet which is not a ScatterChartDataSet", terminator: "\n")
-            }
-            else if let size = scatterDataSet?.scatterShapeSize, size > max
-            {
-                max = size
-            }
-        }
-        
-        return max
+        return (_dataSets as? [ScatterChartDataSetProtocol])?
+            .max { $0.scatterShapeSize < $1.scatterShapeSize }?
+            .scatterShapeSize ?? 0
     }
 }

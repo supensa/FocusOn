@@ -36,6 +36,7 @@
                      @{@"key": @"togglePercent", @"label": @"Toggle Percent"},
                      @{@"key": @"toggleHole", @"label": @"Toggle Hole"},
                      @{@"key": @"toggleIcons", @"label": @"Toggle Icons"},
+                     @{@"key": @"toggleLabelsMinimumAngle", @"label": @"Toggle Labels Minimum Angle"},
                      @{@"key": @"animateX", @"label": @"Animate X"},
                      @{@"key": @"animateY", @"label": @"Animate Y"},
                      @{@"key": @"animateXY", @"label": @"Animate XY"},
@@ -59,7 +60,7 @@
     l.yOffset = 0.0;
     
     // entry label styling
-    _chartView.entryLabelColor = UIColor.whiteColor;
+    _chartView.entryLabelColor = UIColor.blackColor;
     _chartView.entryLabelFont = [UIFont fontWithName:@"HelveticaNeue-Light" size:12.f];
     
     _sliderX.value = 4.0;
@@ -97,7 +98,7 @@
         [values addObject:[[PieChartDataEntry alloc] initWithValue:(arc4random_uniform(mult) + mult / 5) label:parties[i % parties.count] icon: [UIImage imageNamed:@"icon"]]];
     }
     
-    PieChartDataSet *dataSet = [[PieChartDataSet alloc] initWithValues:values label:@"Election Results"];
+    PieChartDataSet *dataSet = [[PieChartDataSet alloc] initWithEntries:values label:@"Election Results"];
     
     dataSet.drawIconsEnabled = NO;
     
@@ -125,7 +126,7 @@
     pFormatter.percentSymbol = @" %";
     [data setValueFormatter:[[ChartDefaultValueFormatter alloc] initWithFormatter:pFormatter]];
     [data setValueFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:11.f]];
-    [data setValueTextColor:UIColor.whiteColor];
+    [data setValueTextColor:UIColor.blackColor];
     
     _chartView.data = data;
     [_chartView highlightValues:nil];
@@ -157,6 +158,12 @@
         return;
     }
     
+    if ([key isEqualToString:@"toggleLabelsMinimumAngle"])
+    {
+        CGFloat newMinimum = _chartView.sliceTextDrawingThreshold == 20.0 ? 0.0 : 20.0;
+        _chartView.sliceTextDrawingThreshold = newMinimum;
+    }
+
     if ([key isEqualToString:@"drawCenter"])
     {
         _chartView.drawCenterTextEnabled = !_chartView.isDrawCenterTextEnabled;

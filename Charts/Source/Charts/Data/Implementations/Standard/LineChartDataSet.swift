@@ -13,7 +13,7 @@ import Foundation
 import CoreGraphics
 
 
-open class LineChartDataSet: LineRadarChartDataSet, ILineChartDataSet
+open class LineChartDataSet: LineRadarChartDataSet, LineChartDataSetProtocol
 {
     @objc(LineChartMode)
     public enum Mode: Int
@@ -36,9 +36,9 @@ open class LineChartDataSet: LineRadarChartDataSet, ILineChartDataSet
         initialize()
     }
     
-    public override init(values: [ChartDataEntry]?, label: String?)
+    public override init(entries: [ChartDataEntry], label: String)
     {
-        super.init(values: values, label: label)
+        super.init(entries: entries, label: label)
         initialize()
     }
     
@@ -67,7 +67,11 @@ open class LineChartDataSet: LineRadarChartDataSet, ILineChartDataSet
             _cubicIntensity = newValue.clamped(to: 0.05...1)
         }
     }
-        
+
+    open var isDrawLineWithGradientEnabled = false
+
+    open var gradientPositions: [CGFloat]?
+    
     /// The radius of the drawn circles.
     open var circleRadius = CGFloat(8.0)
     
@@ -76,7 +80,7 @@ open class LineChartDataSet: LineRadarChartDataSet, ILineChartDataSet
     
     open var circleColors = [NSUIColor]()
     
-    /// - returns: The color at the given index of the DataSet's circle-color array.
+    /// - Returns: The color at the given index of the DataSet's circle-color array.
     /// Performs a IndexOutOfBounds check by modulus.
     open func getCircleColor(atIndex index: Int) -> NSUIColor?
     {
@@ -112,7 +116,7 @@ open class LineChartDataSet: LineRadarChartDataSet, ILineChartDataSet
     /// If true, drawing circles is enabled
     open var drawCirclesEnabled = true
     
-    /// - returns: `true` if drawing circles for this DataSet is enabled, `false` ifnot
+    /// `true` if drawing circles for this DataSet is enabled, `false` ifnot
     open var isDrawCirclesEnabled: Bool { return drawCirclesEnabled }
     
     /// The color of the inner circle (the circle-hole).
@@ -121,7 +125,7 @@ open class LineChartDataSet: LineRadarChartDataSet, ILineChartDataSet
     /// `true` if drawing circles for this DataSet is enabled, `false` ifnot
     open var drawCircleHoleEnabled = true
     
-    /// - returns: `true` if drawing the circle-holes is enabled, `false` ifnot.
+    /// `true` if drawing the circle-holes is enabled, `false` ifnot.
     open var isDrawCircleHoleEnabled: Bool { return drawCircleHoleEnabled }
     
     /// This is how much (in pixels) into the dash pattern are we starting from.
@@ -136,10 +140,10 @@ open class LineChartDataSet: LineRadarChartDataSet, ILineChartDataSet
     open var lineCapType = CGLineCap.butt
     
     /// formatter for customizing the position of the fill-line
-    private var _fillFormatter: IFillFormatter = DefaultFillFormatter()
+    private var _fillFormatter: FillFormatter = DefaultFillFormatter()
     
-    /// Sets a custom IFillFormatter to the chart that handles the position of the filled-line for each DataSet. Set this to null to use the default logic.
-    open var fillFormatter: IFillFormatter?
+    /// Sets a custom FillFormatterProtocol to the chart that handles the position of the filled-line for each DataSet. Set this to null to use the default logic.
+    open var fillFormatter: FillFormatter?
     {
         get
         {
@@ -153,11 +157,13 @@ open class LineChartDataSet: LineRadarChartDataSet, ILineChartDataSet
     
     // MARK: NSCopying
     
-    open override func copyWithZone(_ zone: NSZone?) -> AnyObject
+    open override func copy(with zone: NSZone? = nil) -> Any
     {
-        let copy = super.copyWithZone(zone) as! LineChartDataSet
+        let copy = super.copy(with: zone) as! LineChartDataSet
         copy.circleColors = circleColors
+        copy.circleHoleColor = circleHoleColor
         copy.circleRadius = circleRadius
+        copy.circleHoleRadius = circleHoleRadius
         copy.cubicIntensity = cubicIntensity
         copy.lineDashPhase = lineDashPhase
         copy.lineDashLengths = lineDashLengths
@@ -165,6 +171,7 @@ open class LineChartDataSet: LineRadarChartDataSet, ILineChartDataSet
         copy.drawCirclesEnabled = drawCirclesEnabled
         copy.drawCircleHoleEnabled = drawCircleHoleEnabled
         copy.mode = mode
+        copy._fillFormatter = _fillFormatter
         return copy
     }
 }

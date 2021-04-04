@@ -6,14 +6,17 @@
 
 import Foundation
 import Charts
+#if canImport(UIKit)
+    import UIKit
+#endif
 
 open class XYMarkerView: BalloonMarker
 {
-    @objc open var xAxisValueFormatter: IAxisValueFormatter?
+    @objc open var xAxisValueFormatter: AxisValueFormatter?
     fileprivate var yFormatter = NumberFormatter()
     
     @objc public init(color: UIColor, font: UIFont, textColor: UIColor, insets: UIEdgeInsets,
-                xAxisValueFormatter: IAxisValueFormatter)
+                xAxisValueFormatter: AxisValueFormatter)
     {
         super.init(color: color, font: font, textColor: textColor, insets: insets)
         self.xAxisValueFormatter = xAxisValueFormatter

@@ -12,7 +12,7 @@
 import Foundation
 import CoreGraphics
 
-open class ScatterChartDataSet: LineScatterCandleRadarChartDataSet, IScatterChartDataSet
+open class ScatterChartDataSet: LineScatterCandleRadarChartDataSet, ScatterChartDataSetProtocol
 {
     
     @objc(ScatterShape)
@@ -39,7 +39,7 @@ open class ScatterChartDataSet: LineScatterCandleRadarChartDataSet, IScatterChar
     open var scatterShapeHoleColor: NSUIColor? = nil
     
     /// Sets the ScatterShape this DataSet should be drawn with.
-    /// This will search for an available IShapeRenderer and set this renderer for the DataSet
+    /// This will search for an available ShapeRenderer and set this renderer for the DataSet
     @objc open func setScatterShape(_ shape: Shape)
     {
         self.shapeRenderer = ScatterChartDataSet.renderer(forShape: shape)
@@ -48,9 +48,9 @@ open class ScatterChartDataSet: LineScatterCandleRadarChartDataSet, IScatterChar
     /// The IShapeRenderer responsible for rendering this DataSet.
     /// This can also be used to set a custom IShapeRenderer aside from the default ones.
     /// **default**: `SquareShapeRenderer`
-    open var shapeRenderer: IShapeRenderer? = SquareShapeRenderer()
+    open var shapeRenderer: ShapeRenderer? = SquareShapeRenderer()
     
-    @objc open class func renderer(forShape shape: Shape) -> IShapeRenderer
+    @objc open class func renderer(forShape shape: Shape) -> ShapeRenderer
     {
         switch shape
         {
@@ -66,9 +66,9 @@ open class ScatterChartDataSet: LineScatterCandleRadarChartDataSet, IScatterChar
     
     // MARK: NSCopying
     
-    open override func copyWithZone(_ zone: NSZone?) -> AnyObject
+    open override func copy(with zone: NSZone? = nil) -> Any
     {
-        let copy = super.copyWithZone(zone) as! ScatterChartDataSet
+        let copy = super.copy(with: zone) as! ScatterChartDataSet
         copy.scatterShapeSize = scatterShapeSize
         copy.scatterShapeHoleRadius = scatterShapeHoleRadius
         copy.scatterShapeHoleColor = scatterShapeHoleColor

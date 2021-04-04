@@ -20,6 +20,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Instantiate dataController for Core Data
     let dataController = DataController.init(xcdatamodeldName: Constant.datamodelName)
     dataController.load()
+    // Generate dummy data for testing purpose.
+//     DummyData.generate(context: dataController.context)
     // Instantiate window and storyboard
     let storyboard = UIStoryboard(name: Constant.storyboardName, bundle: nil)
     window = UIWindow()

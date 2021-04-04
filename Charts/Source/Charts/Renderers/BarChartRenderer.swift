@@ -40,10 +40,7 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
     /// The ````internal```` specifier is to allow subclasses (HorizontalBar) to populate the same array
     internal lazy var accessibilityOrderedElements: [[NSUIAccessibilityElement]] = accessibilityCreateEmptyOrderedElements()
 
-    private class Buffer
-    {
-        var rects = [CGRect]()
-    }
+    private typealias Buffer = [CGRect]
     
     @objc open weak var dataProvider: BarChartDataProvider?
     
@@ -59,122 +56,64 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
     
     open override func initBuffers()
     {
-        if let barData = dataProvider?.barData
+        guard let barData = dataProvider?.barData else { return _buffers.removeAll() }
+
+        // Match buffers count to dataset count
+        if _buffers.count != barData.count
         {
-            // Matche buffers count to dataset count
-            if _buffers.count != barData.dataSetCount
+            while _buffers.count < barData.count
             {
-                while _buffers.count < barData.dataSetCount
-                {
-                    _buffers.append(Buffer())
-                }
-                while _buffers.count > barData.dataSetCount
-                {
-                    _buffers.removeLast()
-                }
+                _buffers.append(Buffer())
             }
-            
-            for i in stride(from: 0, to: barData.dataSetCount, by: 1)
+            while _buffers.count > barData.count
             {
-                let set = barData.dataSets[i] as! IBarChartDataSet
-                let size = set.entryCount * (set.isStacked ? set.stackSize : 1)
-                if _buffers[i].rects.count != size
-                {
-                    _buffers[i].rects = [CGRect](repeating: CGRect(), count: size)
-                }
+                _buffers.removeLast()
             }
         }
-        else
-        {
-            _buffers.removeAll()
+
+        _buffers = zip(_buffers, barData).map { buffer, set -> Buffer in
+            let set = set as! BarChartDataSetProtocol
+            let size = set.entryCount * (set.isStacked ? set.stackSize : 1)
+            return buffer.count == size
+                ? buffer
+                : Buffer(repeating: .zero, count: size)
         }
     }
     
-    private func prepareBuffer(dataSet: IBarChartDataSet, index: Int)
+    private func prepareBuffer(dataSet: BarChartDataSetProtocol, index: Int)
     {
         guard
             let dataProvider = dataProvider,
             let barData = dataProvider.barData
             else { return }
         
-        let barWidthHalf = barData.barWidth / 2.0
+        let barWidthHalf = CGFloat(barData.barWidth / 2.0)
     
-        let buffer = _buffers[index]
         var bufferIndex = 0
         let containsStacks = dataSet.isStacked
         
         let isInverted = dataProvider.isInverted(axis: dataSet.axisDependency)
-        let phaseY = animator.phaseY
-        var barRect = CGRect()
-        var x: Double
-        var y: Double
-        
-        for i in stride(from: 0, to: min(Int(ceil(Double(dataSet.entryCount) * animator.phaseX)), dataSet.entryCount), by: 1)
+        let phaseY = CGFloat(animator.phaseY)
+
+        for i in (0..<dataSet.entryCount).clamped(to: 0..<Int(ceil(Double(dataSet.entryCount) * animator.phaseX)))
         {
             guard let e = dataSet.entryForIndex(i) as? BarChartDataEntry else { continue }
-            
-            let vals = e.yValues
 
-            x = e.x
-            y = e.y
+            let x = CGFloat(e.x)
+            let left = x - barWidthHalf
+            let right = x + barWidthHalf
 
-            if !containsStacks || vals == nil
-            {
-                let left = CGFloat(x - barWidthHalf)
-                let right = CGFloat(x + barWidthHalf)
-                var top = isInverted
-                    ? (y <= 0.0 ? CGFloat(y) : 0)
-                    : (y >= 0.0 ? CGFloat(y) : 0)
-                var bottom = isInverted
-                    ? (y >= 0.0 ? CGFloat(y) : 0)
-                    : (y <= 0.0 ? CGFloat(y) : 0)
+            var y = e.y
 
-                // multiply the height of the rect with the phase
-                if top > 0
-                {
-                    top *= CGFloat(phaseY)
-                }
-                else
-                {
-                    bottom *= CGFloat(phaseY)
-                }
-
-                // When drawing with an auto calculated y-axis minimum, the renderer actually draws each bar from 0
-                // to the required value. This drawn bar is then clipped to the visible chart rect in BarLineChartViewBase's draw(rect:) using clipDataToContent.
-                // While this works fine when calculating the bar rects for drawing, it causes the accessibilityFrames to be oversized in some cases.
-                // This offset attempts to undo that unnecessary drawing when calculating barRects, particularly when not using custom axis minima.
-                // This allows the minimum to still be visually non zero, but the rects are only drawn where necessary.
-                // This offset calculation also avoids cases where there are positive/negative values mixed, since those won't need this offset.
-                var offset: CGFloat = 0.0
-                if let offsetView = dataProvider as? BarChartView {
-
-                    let offsetAxis = offsetView.leftAxis.isEnabled ? offsetView.leftAxis : offsetView.rightAxis
-
-                    if barData.yMin.sign != barData.yMax.sign { offset = 0.0 }
-                    else if !offsetAxis._customAxisMin {
-                        offset = CGFloat(offsetAxis.axisMinimum)
-                    }
-                }
-
-                barRect.origin.x = left
-                barRect.size.width = right - left
-                barRect.origin.y = top
-                barRect.size.height = bottom == top ? 0 : bottom - top + offset
-
-                buffer.rects[bufferIndex] = barRect
-                bufferIndex += 1
-            }
-            else
+            if containsStacks, let vals = e.yValues
             {
                 var posY = 0.0
                 var negY = -e.negativeSum
                 var yStart = 0.0
                 
                 // fill the stack
-                for k in 0 ..< vals!.count
+                for value in vals
                 {
-                    let value = vals![k]
-                    
                     if value == 0.0 && (posY == 0.0 || negY == 0.0)
                     {
                         // Take care of the situation of a 0.0 value, which overlaps a non-zero bar
@@ -194,8 +133,6 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                         negY += abs(value)
                     }
                     
-                    let left = CGFloat(x - barWidthHalf)
-                    let right = CGFloat(x + barWidthHalf)
                     var top = isInverted
                         ? (y <= yStart ? CGFloat(y) : CGFloat(yStart))
                         : (y >= yStart ? CGFloat(y) : CGFloat(yStart))
@@ -204,17 +141,115 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                         : (y <= yStart ? CGFloat(y) : CGFloat(yStart))
                     
                     // multiply the height of the rect with the phase
-                    top *= CGFloat(phaseY)
-                    bottom *= CGFloat(phaseY)
-                    
-                    barRect.origin.x = left
-                    barRect.size.width = right - left
-                    barRect.origin.y = top
-                    barRect.size.height = bottom - top
-                    
-                    buffer.rects[bufferIndex] = barRect
+                    top *= phaseY
+                    bottom *= phaseY
+
+                    let barRect = CGRect(x: left, y: top,
+                                         width: right - left,
+                                         height: bottom - top)
+                    _buffers[index][bufferIndex] = barRect
                     bufferIndex += 1
                 }
+            }
+            else
+            {
+                var top = isInverted
+                    ? (y <= 0.0 ? CGFloat(y) : 0)
+                    : (y >= 0.0 ? CGFloat(y) : 0)
+                var bottom = isInverted
+                    ? (y >= 0.0 ? CGFloat(y) : 0)
+                    : (y <= 0.0 ? CGFloat(y) : 0)
+                
+                /* When drawing each bar, the renderer actually draws each bar from 0 to the required value.
+                 * This drawn bar is then clipped to the visible chart rect in BarLineChartViewBase's draw(rect:) using clipDataToContent.
+                 * While this works fine when calculating the bar rects for drawing, it causes the accessibilityFrames to be oversized in some cases.
+                 * This offset attempts to undo that unnecessary drawing when calculating barRects
+                 *
+                 * +---------------------------------------------------------------+---------------------------------------------------------------+
+                 * |      Situation 1:  (!inverted && y >= 0)                      |      Situation 3:  (inverted && y >= 0)                       |
+                 * |                                                               |                                                               |
+                 * |        y ->           +--+       <- top                       |        0 -> ---+--+---+--+------   <- top                     |
+                 * |                       |//|        } topOffset = y - max       |                |  |   |//|          } topOffset = min         |
+                 * |      max -> +---------+--+----+  <- top - topOffset           |      min -> +--+--+---+--+----+    <- top + topOffset         |
+                 * |             |  +--+   |//|    |                               |             |  |  |   |//|    |                               |
+                 * |             |  |  |   |//|    |                               |             |  +--+   |//|    |                               |
+                 * |             |  |  |   |//|    |                               |             |         |//|    |                               |
+                 * |      min -> +--+--+---+--+----+  <- bottom + bottomOffset     |      max -> +---------+--+----+    <- bottom - bottomOffset   |
+                 * |                |  |   |//|        } bottomOffset = min        |                       |//|          } bottomOffset = y - max  |
+                 * |        0 -> ---+--+---+--+-----  <- bottom                    |        y ->           +--+         <- bottom                  |
+                 * |                                                               |                                                               |
+                 * +---------------------------------------------------------------+---------------------------------------------------------------+
+                 * |      Situation 2:  (!inverted && y < 0)                       |      Situation 4:  (inverted && y < 0)                        |
+                 * |                                                               |                                                               |
+                 * |        0 -> ---+--+---+--+-----   <- top                      |        y ->           +--+         <- top                     |
+                 * |                |  |   |//|         } topOffset = -max         |                       |//|          } topOffset = min - y     |
+                 * |      max -> +--+--+---+--+----+   <- top - topOffset          |      min -> +---------+--+----+    <- top + topOffset         |
+                 * |             |  |  |   |//|    |                               |             |  +--+   |//|    |                               |
+                 * |             |  +--+   |//|    |                               |             |  |  |   |//|    |                               |
+                 * |             |         |//|    |                               |             |  |  |   |//|    |                               |
+                 * |      min -> +---------+--+----+   <- bottom + bottomOffset    |      max -> +--+--+---+--+----+    <- bottom - bottomOffset   |
+                 * |                       |//|         } bottomOffset = min - y   |                |  |   |//|          } bottomOffset = -max     |
+                 * |        y ->           +--+        <- bottom                   |        0 -> ---+--+---+--+-------  <- bottom                  |
+                 * |                                                               |                                                               |
+                 * +---------------------------------------------------------------+---------------------------------------------------------------+
+                 */
+                var topOffset: CGFloat = 0.0
+                var bottomOffset: CGFloat = 0.0
+                if let offsetView = dataProvider as? BarChartView
+                {
+                    let offsetAxis = offsetView.getAxis(dataSet.axisDependency)
+                    if y >= 0
+                    {
+                        // situation 1
+                        if offsetAxis.axisMaximum < y
+                        {
+                            topOffset = CGFloat(y - offsetAxis.axisMaximum)
+                        }
+                        if offsetAxis.axisMinimum > 0
+                        {
+                            bottomOffset = CGFloat(offsetAxis.axisMinimum)
+                        }
+                    }
+                    else // y < 0
+                    {
+                        //situation 2
+                        if offsetAxis.axisMaximum < 0
+                        {
+                            topOffset = CGFloat(offsetAxis.axisMaximum * -1)
+                        }
+                        if offsetAxis.axisMinimum > y
+                        {
+                            bottomOffset = CGFloat(offsetAxis.axisMinimum - y)
+                        }
+                    }
+                    if isInverted
+                    {
+                        // situation 3 and 4
+                        // exchange topOffset/bottomOffset based on 1 and 2
+                        // see diagram above
+                        (topOffset, bottomOffset) = (bottomOffset, topOffset)
+                    }
+                }
+                //apply offset
+                top = isInverted ? top + topOffset : top - topOffset
+                bottom = isInverted ? bottom - bottomOffset : bottom + bottomOffset
+
+                // multiply the height of the rect with the phase
+                // explicitly add 0 + topOffset to indicate this is changed after adding accessibility support (#3650, #3520)
+                if top > 0 + topOffset
+                {
+                    top *= phaseY
+                }
+                else
+                {
+                    bottom *= phaseY
+                }
+
+                let barRect = CGRect(x: left, y: top,
+                                     width: right - left,
+                                     height: bottom - top)
+                _buffers[index][bufferIndex] = barRect
+                bufferIndex += 1
             }
         }
     }
@@ -239,19 +274,15 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
         }
 
         // Populate logically ordered nested elements into accessibilityOrderedElements in drawDataSet()
-        for i in 0 ..< barData.dataSetCount
+        for i in barData.indices
         {
-            guard let set = barData.getDataSetByIndex(i) else { continue }
-            
-            if set.isVisible
-            {
-                if !(set is IBarChartDataSet)
-                {
-                    fatalError("Datasets for BarChartRenderer must conform to IBarChartDataset")
-                }
-                
-                drawDataSet(context: context, dataSet: set as! IBarChartDataSet, index: i)
+            guard let set = barData[i] as? BarChartDataSetProtocol else {
+                fatalError("Datasets for BarChartRenderer must conform to IBarChartDataset")
             }
+
+            guard set.isVisible else { continue }
+
+            drawDataSet(context: context, dataSet: set, index: i)
         }
 
         // Merge nested ordered arrays into the single accessibleChartElements.
@@ -260,21 +291,22 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
     }
 
     private var _barShadowRectBuffer: CGRect = CGRect()
-
-    @objc open func drawDataSet(context: CGContext, dataSet: IBarChartDataSet, index: Int)
+    
+    @objc open func drawDataSet(context: CGContext, dataSet: BarChartDataSetProtocol, index: Int)
     {
         guard let dataProvider = dataProvider else { return }
 
         let trans = dataProvider.getTransformer(forAxis: dataSet.axisDependency)
 
         prepareBuffer(dataSet: dataSet, index: index)
-        trans.rectValuesToPixel(&_buffers[index].rects)
-
+        trans.rectValuesToPixel(&_buffers[index])
+        
         let borderWidth = dataSet.barBorderWidth
         let borderColor = dataSet.barBorderColor
         let drawBorder = borderWidth > 0.0
         
         context.saveGState()
+        defer { context.restoreGState() }
         
         // draw the bar shadow before the values
         if dataProvider.isDrawBarShadowEnabled
@@ -284,8 +316,9 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             let barWidth = barData.barWidth
             let barWidthHalf = barWidth / 2.0
             var x: Double = 0.0
-            
-            for i in stride(from: 0, to: min(Int(ceil(Double(dataSet.entryCount) * animator.phaseX)), dataSet.entryCount), by: 1)
+
+            let range = (0..<dataSet.entryCount).clamped(to: 0..<Int(ceil(Double(dataSet.entryCount) * animator.phaseX)))
+            for i in range
             {
                 guard let e = dataSet.entryForIndex(i) as? BarChartDataEntry else { continue }
                 
@@ -296,15 +329,9 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 
                 trans.rectValueToPixel(&_barShadowRectBuffer)
                 
-                if !viewPortHandler.isInBoundsLeft(_barShadowRectBuffer.origin.x + _barShadowRectBuffer.size.width)
-                {
-                    continue
-                }
+                guard viewPortHandler.isInBoundsLeft(_barShadowRectBuffer.origin.x + _barShadowRectBuffer.size.width) else { continue }
                 
-                if !viewPortHandler.isInBoundsRight(_barShadowRectBuffer.origin.x)
-                {
-                    break
-                }
+                guard viewPortHandler.isInBoundsRight(_barShadowRectBuffer.origin.x) else { break }
                 
                 _barShadowRectBuffer.origin.y = viewPortHandler.contentTop
                 _barShadowRectBuffer.size.height = viewPortHandler.contentHeight
@@ -319,20 +346,10 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
         // draw the bar shadow before the values
         if dataProvider.isDrawBarShadowEnabled
         {
-            for j in stride(from: 0, to: buffer.rects.count, by: 1)
+            for barRect in buffer where viewPortHandler.isInBoundsLeft(barRect.origin.x + barRect.size.width)
             {
-                let barRect = buffer.rects[j]
-                
-                if (!viewPortHandler.isInBoundsLeft(barRect.origin.x + barRect.size.width))
-                {
-                    continue
-                }
-                
-                if (!viewPortHandler.isInBoundsRight(barRect.origin.x))
-                {
-                    break
-                }
-                
+                guard viewPortHandler.isInBoundsRight(barRect.origin.x) else { break }
+
                 context.setFillColor(dataSet.barShadowColor.cgColor)
                 context.fill(barRect)
             }
@@ -344,25 +361,18 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
         {
             context.setFillColor(dataSet.color(atIndex: 0).cgColor)
         }
-
+        
         // In case the chart is stacked, we need to accomodate individual bars within accessibilityOrdereredElements
         let isStacked = dataSet.isStacked
         let stackSize = isStacked ? dataSet.stackSize : 1
 
-        for j in stride(from: 0, to: buffer.rects.count, by: 1)
+        for j in buffer.indices
         {
-            let barRect = buffer.rects[j]
+            let barRect = buffer[j]
+            
+            guard viewPortHandler.isInBoundsLeft(barRect.origin.x + barRect.size.width) else { continue }
+            guard viewPortHandler.isInBoundsRight(barRect.origin.x) else { break }
 
-            if (!viewPortHandler.isInBoundsLeft(barRect.origin.x + barRect.size.width))
-            {
-                continue
-            }
-            
-            if (!viewPortHandler.isInBoundsRight(barRect.origin.x))
-            {
-                break
-            }
-            
             if !isSingleColor
             {
                 // Set the color for the currently drawn value. If the index is out of bounds, reuse colors.
@@ -381,20 +391,19 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             // Create and append the corresponding accessibility element to accessibilityOrderedElements
             if let chart = dataProvider as? BarChartView
             {
-                let element = createAccessibleElement(withIndex: j,
-                                                      container: chart,
-                                                      dataSet: dataSet,
-                                                      dataSetIndex: index,
-                                                      stackSize: stackSize)
-                { (element) in
+                let element = createAccessibleElement(
+                    withIndex: j,
+                    container: chart,
+                    dataSet: dataSet,
+                    dataSetIndex: index,
+                    stackSize: stackSize
+                ) { (element) in
                     element.accessibilityFrame = barRect
                 }
 
                 accessibilityOrderedElements[j/stackSize].append(element)
             }
         }
-        
-        context.restoreGState()
     }
     
     open func prepareBarHighlight(
@@ -428,21 +437,19 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 let barData = dataProvider.barData
                 else { return }
 
-            var dataSets = barData.dataSets
-
             let valueOffsetPlus: CGFloat = 4.5
             var posOffset: CGFloat
             var negOffset: CGFloat
             let drawValueAboveBar = dataProvider.isDrawValueAboveBarEnabled
-
-            for dataSetIndex in 0 ..< barData.dataSetCount
+            
+            for dataSetIndex in barData.indices
             {
-                guard let dataSet = dataSets[dataSetIndex] as? IBarChartDataSet else { continue }
+                guard
+                    let dataSet = barData[dataSetIndex] as? BarChartDataSetProtocol,
+                    shouldDrawValues(forDataSet: dataSet)
+                    else { continue }
                 
-                if !shouldDrawValues(forDataSet: dataSet)
-                {
-                    continue
-                }
+                let angleRadians = dataSet.valueLabelAngle.DEG2RAD
                 
                 let isInverted = dataProvider.isInverted(axis: dataSet.axisDependency)
                 
@@ -460,7 +467,7 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 
                 let buffer = _buffers[dataSetIndex]
                 
-                guard let formatter = dataSet.valueFormatter else { continue }
+                let formatter = dataSet.valueFormatter
                 
                 let trans = dataProvider.getTransformer(forAxis: dataSet.axisDependency)
                 
@@ -471,24 +478,20 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 // if only single values are drawn (sum)
                 if !dataSet.isStacked
                 {
-                    for j in 0 ..< Int(ceil(Double(dataSet.entryCount) * animator.phaseX))
+                    let range = 0 ..< Int(ceil(Double(dataSet.entryCount) * animator.phaseX))
+                    for j in range
                     {
                         guard let e = dataSet.entryForIndex(j) as? BarChartDataEntry else { continue }
                         
-                        let rect = buffer.rects[j]
+                        let rect = buffer[j]
                         
                         let x = rect.origin.x + rect.size.width / 2.0
                         
-                        if !viewPortHandler.isInBoundsRight(x)
-                        {
-                            break
-                        }
+                        guard viewPortHandler.isInBoundsRight(x) else { break }
                         
-                        if !viewPortHandler.isInBoundsY(rect.origin.y)
-                            || !viewPortHandler.isInBoundsLeft(x)
-                        {
-                            continue
-                        }
+                        guard viewPortHandler.isInBoundsY(rect.origin.y),
+                            viewPortHandler.isInBoundsLeft(x)
+                            else { continue }
                         
                         let val = e.y
                         
@@ -507,7 +510,9 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                                     : (rect.origin.y + rect.size.height + negOffset),
                                 font: valueFont,
                                 align: .center,
-                                color: dataSet.valueTextColorAt(j))
+                                color: dataSet.valueTextColorAt(j),
+                                anchor: CGPoint(x: 0.5, y: 0.5),
+                                angleRadians: angleRadians)
                         }
                         
                         if let icon = e.icon, dataSet.isDrawIconsEnabled
@@ -520,13 +525,11 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                             px += iconsOffset.x
                             py += iconsOffset.y
                             
-                            ChartUtils.drawImage(
-                                context: context,
-                                image: icon,
-                                x: px,
-                                y: py,
-                                size: icon.size)
+                            context.drawImage(icon,
+                                              atCenter: CGPoint(x: px, y: py),
+                                              size: icon.size)
                         }
+                        
                     }
                 }
                 else
@@ -534,79 +537,30 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                     // if we have stacks
                     
                     var bufferIndex = 0
-                    
-                    for index in 0 ..< Int(ceil(Double(dataSet.entryCount) * animator.phaseX))
+                    let lastIndex = ceil(Double(dataSet.entryCount) * animator.phaseX)
+
+                    for index in 0 ..< Int(lastIndex)
                     {
                         guard let e = dataSet.entryForIndex(index) as? BarChartDataEntry else { continue }
                         
                         let vals = e.yValues
                         
-                        let rect = buffer.rects[bufferIndex]
+                        let rect = buffer[bufferIndex]
                         
                         let x = rect.origin.x + rect.size.width / 2.0
                         
                         // we still draw stacked bars, but there is one non-stacked in between
-                        if vals == nil
-                        {
-                            if !viewPortHandler.isInBoundsRight(x)
-                            {
-                                break
-                            }
-                            
-                            if !viewPortHandler.isInBoundsY(rect.origin.y)
-                                || !viewPortHandler.isInBoundsLeft(x)
-                            {
-                                continue
-                            }
-                            
-                            if dataSet.isDrawValuesEnabled
-                            {
-                                drawValue(
-                                    context: context,
-                                    value: formatter.stringForValue(
-                                        e.y,
-                                        entry: e,
-                                        dataSetIndex: dataSetIndex,
-                                        viewPortHandler: viewPortHandler),
-                                    xPos: x,
-                                    yPos: rect.origin.y +
-                                        (e.y >= 0 ? posOffset : negOffset),
-                                    font: valueFont,
-                                    align: .center,
-                                    color: dataSet.valueTextColorAt(index))
-                            }
-                            
-                            if let icon = e.icon, dataSet.isDrawIconsEnabled
-                            {
-                                var px = x
-                                var py = rect.origin.y +
-                                    (e.y >= 0 ? posOffset : negOffset)
-                                
-                                px += iconsOffset.x
-                                py += iconsOffset.y
-                                
-                                ChartUtils.drawImage(
-                                    context: context,
-                                    image: icon,
-                                    x: px,
-                                    y: py,
-                                    size: icon.size)
-                            }
-                        }
-                        else
+                        if let values = vals
                         {
                             // draw stack values
-                            
-                            let vals = vals!
                             var transformed = [CGPoint]()
-                            
+
                             var posY = 0.0
                             var negY = -e.negativeSum
-                            
-                            for k in 0 ..< vals.count
+
+                            for value in values
                             {
-                                let value = vals[k]
-                                var y: Double
+                                let y: Double
                                 
                                 if value == 0.0 && (posY == 0.0 || negY == 0.0)
                                 {
@@ -623,34 +577,28 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                                     y = negY
                                     negY -= value
                                 }
-                                
+
                                 transformed.append(CGPoint(x: 0.0, y: CGFloat(y * phaseY)))
                             }
-                            
+
                             trans.pointValuesToPixel(&transformed)
-                            
-                            for k in 0 ..< transformed.count
+
+                            for (value, transformed) in zip(values, transformed)
                             {
-                                let val = vals[k]
-                                let drawBelow = (val == 0.0 && negY == 0.0 && posY > 0.0) || val < 0.0
-                                let y = transformed[k].y + (drawBelow ? negOffset : posOffset)
-                                
-                                if !viewPortHandler.isInBoundsRight(x)
-                                {
-                                    break
-                                }
-                                
-                                if !viewPortHandler.isInBoundsY(y) || !viewPortHandler.isInBoundsLeft(x)
-                                {
-                                    continue
-                                }
-                                
+                                let drawBelow = (value == 0.0 && negY == 0.0 && posY > 0.0) || value < 0.0
+                                let y = transformed.y + (drawBelow ? negOffset : posOffset)
+
+                                guard viewPortHandler.isInBoundsRight(x) else { break }
+                                guard viewPortHandler.isInBoundsY(y),
+                                    viewPortHandler.isInBoundsLeft(x)
+                                    else { continue }
+
                                 if dataSet.isDrawValuesEnabled
                                 {
                                     drawValue(
                                         context: context,
                                         value: formatter.stringForValue(
-                                            vals[k],
+                                            value,
                                             entry: e,
                                             dataSetIndex: dataSetIndex,
                                             viewPortHandler: viewPortHandler),
@@ -658,22 +606,61 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                                         yPos: y,
                                         font: valueFont,
                                         align: .center,
-                                        color: dataSet.valueTextColorAt(index))
+                                        color: dataSet.valueTextColorAt(index),
+                                        anchor: CGPoint(x: 0.5, y: 0.5),
+                                        angleRadians: angleRadians)
                                 }
-                                
+
                                 if let icon = e.icon, dataSet.isDrawIconsEnabled
                                 {
-                                    ChartUtils.drawImage(
-                                        context: context,
-                                        image: icon,
-                                        x: x + iconsOffset.x,
-                                        y: y + iconsOffset.y,
-                                        size: icon.size)
+                                    context.drawImage(icon,
+                                                      atCenter: CGPoint(x: x + iconsOffset.x,
+                                                                      y: y + iconsOffset.y),
+                                                      size: icon.size)
                                 }
                             }
                         }
-                        
-                        bufferIndex = vals == nil ? (bufferIndex + 1) : (bufferIndex + vals!.count)
+                        else
+                        {
+                            guard viewPortHandler.isInBoundsRight(x) else { break }
+                            guard viewPortHandler.isInBoundsY(rect.origin.y),
+                                viewPortHandler.isInBoundsLeft(x) else { continue }
+
+                            if dataSet.isDrawValuesEnabled
+                            {
+                                drawValue(
+                                    context: context,
+                                    value: formatter.stringForValue(
+                                        e.y,
+                                        entry: e,
+                                        dataSetIndex: dataSetIndex,
+                                        viewPortHandler: viewPortHandler),
+                                    xPos: x,
+                                    yPos: rect.origin.y +
+                                        (e.y >= 0 ? posOffset : negOffset),
+                                    font: valueFont,
+                                    align: .center,
+                                    color: dataSet.valueTextColorAt(index),
+                                    anchor: CGPoint(x: 0.5, y: 0.5),
+                                    angleRadians: angleRadians)
+                            }
+                            
+                            if let icon = e.icon, dataSet.isDrawIconsEnabled
+                            {
+                                var px = x
+                                var py = rect.origin.y +
+                                    (e.y >= 0 ? posOffset : negOffset)
+                                
+                                px += iconsOffset.x
+                                py += iconsOffset.y
+                                
+                                context.drawImage(icon,
+                                                  atCenter: CGPoint(x: px, y: py),
+                                                  size: icon.size)
+                            }
+                        }
+
+                        bufferIndex += vals?.count ?? 1
                     }
                 }
             }
@@ -681,10 +668,19 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
     }
     
     /// Draws a value at the specified x and y position.
-    @objc open func drawValue(context: CGContext, value: String, xPos: CGFloat, yPos: CGFloat, font: NSUIFont, align: NSTextAlignment, color: NSUIColor)
+    @objc open func drawValue(context: CGContext, value: String, xPos: CGFloat, yPos: CGFloat, font: NSUIFont, align: TextAlignment, color: NSUIColor, anchor: CGPoint, angleRadians: CGFloat)
     {
-        ChartUtils.drawText(context: context, text: value, point: CGPoint(x: xPos, y: yPos), align: align, attributes: [NSAttributedString.Key.font: font, NSAttributedString.Key.foregroundColor: color])
+        if (angleRadians == 0.0)
+        {
+            context.drawText(value, at: CGPoint(x: xPos, y: yPos), align: align, attributes: [.font: font, .foregroundColor: color])
+        }
+        else
+        {
+            // align left to center text with rotation
+            context.drawText(value, at: CGPoint(x: xPos, y: yPos), align: align, anchor: anchor, angleRadians: angleRadians, attributes: [.font: font, .foregroundColor: color])
+        }
     }
+
     
     open override func drawExtras(context: CGContext)
     {
@@ -699,22 +695,19 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             else { return }
         
         context.saveGState()
-        
+        defer { context.restoreGState() }
         var barRect = CGRect()
         
         for high in indices
         {
             guard
-                let set = barData.getDataSetByIndex(high.dataSetIndex) as? IBarChartDataSet,
+                let set = barData[high.dataSetIndex] as? BarChartDataSetProtocol,
                 set.isHighlightEnabled
                 else { continue }
             
             if let e = set.entryForXValue(high.x, closestToY: high.y) as? BarChartDataEntry
             {
-                if !isInBoundsX(entry: e, dataSet: set)
-                {
-                    continue
-                }
+                guard isInBoundsX(entry: e, dataSet: set) else { continue }
                 
                 let trans = dataProvider.getTransformer(forAxis: set.axisDependency)
                 
@@ -754,8 +747,6 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
                 context.fill(barRect)
             }
         }
-        
-        context.restoreGState()
     }
 
     /// Sets the drawing position of the highlight object based on the given bar-rect.
@@ -782,7 +773,7 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
     /// Note that it is marked internal to support subclass modification in the HorizontalBarChart.
     internal func createAccessibleElement(withIndex idx: Int,
                                           container: BarChartView,
-                                          dataSet: IBarChartDataSet,
+                                          dataSet: BarChartDataSetProtocol,
                                           dataSetIndex: Int,
                                           stackSize: Int,
                                           modifier: (NSUIAccessibilityElement) -> ()) -> NSUIAccessibilityElement
@@ -798,29 +789,32 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
         // there is the possibility of some labels being rounded up. A floor() might fix this, but seems to be a brute force solution.
         let label = xAxis.valueFormatter?.stringForValue(e.x, axis: xAxis) ?? "\(e.x)"
 
-        var elementValueText = dataSet.valueFormatter?.stringForValue(
+        var elementValueText = dataSet.valueFormatter.stringForValue(
             e.y,
             entry: e,
             dataSetIndex: dataSetIndex,
-            viewPortHandler: viewPortHandler) ?? "\(e.y)"
+            viewPortHandler: viewPortHandler)
 
         if dataSet.isStacked, let vals = e.yValues
         {
             let labelCount = min(dataSet.colors.count, stackSize)
 
             let stackLabel: String?
-            if (dataSet.stackLabels.count > 0 && labelCount > 0) {
+            if (!dataSet.stackLabels.isEmpty && labelCount > 0) {
                 let labelIndex = idx % labelCount
                 stackLabel = dataSet.stackLabels.indices.contains(labelIndex) ? dataSet.stackLabels[labelIndex] : nil
             } else {
                 stackLabel = nil
             }
+            
+            //Handles empty array of yValues
+            let yValue = vals.isEmpty ? 0.0 : vals[idx % vals.count]
 
-            elementValueText = dataSet.valueFormatter?.stringForValue(
-                vals[idx % stackSize],
+            elementValueText = dataSet.valueFormatter.stringForValue(
+                yValue,
                 entry: e,
                 dataSetIndex: dataSetIndex,
-                viewPortHandler: viewPortHandler) ?? "\(e.y)"
+                viewPortHandler: viewPortHandler)
 
             if let stackLabel = stackLabel {
                 elementValueText = stackLabel + " \(elementValueText)"

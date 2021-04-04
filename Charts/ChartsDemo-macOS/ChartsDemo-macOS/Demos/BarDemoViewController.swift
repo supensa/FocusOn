@@ -29,13 +29,13 @@ open class BarDemoViewController: NSViewController
         let yse2 = ys2.enumerated().map { x, y in return BarChartDataEntry(x: Double(x), y: y) }
         
         let data = BarChartData()
-        let ds1 = BarChartDataSet(values: yse1, label: "Hello")
+        let ds1 = BarChartDataSet(entries: yse1, label: "Hello")
         ds1.colors = [NSUIColor.red]
-        data.addDataSet(ds1)
+        data.append(ds1)
 
-        let ds2 = BarChartDataSet(values: yse2, label: "World")
+        let ds2 = BarChartDataSet(entries: yse2, label: "World")
         ds2.colors = [NSUIColor.blue]
-        data.addDataSet(ds2)
+        data.append(ds2)
 
         let barWidth = 0.4
         let barSpace = 0.05
@@ -51,10 +51,10 @@ open class BarDemoViewController: NSViewController
         
         self.barChartView.gridBackgroundColor = NSUIColor.white
         
-        self.barChartView.chartDescription?.text = "Barchart Demo"
+        self.barChartView.chartDescription.text = "Barchart Demo"
     }
     
-    @IBAction func save(_ sender: AnyObject)
+    @IBAction func save(_ sender: Any)
     {
         let panel = NSSavePanel()
         panel.allowedFileTypes = ["png"]

@@ -31,6 +31,7 @@
                      @{@"key": @"toggleXValues", @"label": @"Toggle X-Values"},
                      @{@"key": @"togglePercent", @"label": @"Toggle Percent"},
                      @{@"key": @"toggleHole", @"label": @"Toggle Hole"},
+                     @{@"key": @"toggleLabelsMinimumAngle", @"label": @"Toggle Labels Minimum Angle"},
                      @{@"key": @"animateX", @"label": @"Animate X"},
                      @{@"key": @"animateY", @"label": @"Animate Y"},
                      @{@"key": @"animateXY", @"label": @"Animate XY"},
@@ -82,7 +83,7 @@
         [entries addObject:[[PieChartDataEntry alloc] initWithValue:(arc4random_uniform(mult) + mult / 5) label:parties[i % parties.count]]];
     }
     
-    PieChartDataSet *dataSet = [[PieChartDataSet alloc] initWithValues:entries label:@"Election Results"];
+    PieChartDataSet *dataSet = [[PieChartDataSet alloc] initWithEntries:entries label:@"Election Results"];
     dataSet.sliceSpace = 2.0;
     
     // add a lot of colors
@@ -144,6 +145,12 @@
         return;
     }
     
+    if ([key isEqualToString:@"toggleLabelsMinimumAngle"])
+    {
+        CGFloat newMinimum = _chartView.sliceTextDrawingThreshold == 20.0 ? 0.0 : 20.0;
+        _chartView.sliceTextDrawingThreshold = newMinimum;
+    }
+
     if ([key isEqualToString:@"drawCenter"])
     {
         _chartView.drawCenterTextEnabled = !_chartView.isDrawCenterTextEnabled;

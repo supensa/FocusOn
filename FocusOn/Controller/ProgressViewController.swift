@@ -30,10 +30,9 @@ class ProgressViewController: ViewController {
     legend.enabled = true
     legend.horizontalAlignment = .center
     legend.verticalAlignment = .top
-    legend.yOffset = 10
+    legend.yOffset = 0
     legend.xOffset = 0
     legend.orientation = .horizontal
-    legend.drawInside = true
     
     let xaxis = barChartView.xAxis
     xaxis.drawGridLinesEnabled = false
@@ -151,8 +150,8 @@ class ProgressViewController: ViewController {
       taskDataEntries.append(dataEntry1)
     }
     
-    goalDataSet = BarChartDataSet(values: goalDataEntries, label: "% goals completed")
-    taskDataSet = BarChartDataSet(values: taskDataEntries, label: "% tasks completed")
+    goalDataSet = BarChartDataSet(entries: goalDataEntries, label: "% goals completed")
+    taskDataSet = BarChartDataSet(entries: taskDataEntries, label: "% tasks completed")
     
     goalDataSet.colors = [UIColor.black]
     goalDataSet.highlightColor = .clear
@@ -164,9 +163,9 @@ class ProgressViewController: ViewController {
   }
 }
 
-/// Needed class conforming to IValueFormatter protocol.
+/// Needed class conforming to ValueFormatter protocol.
 /// Used to round value and show it on graph if not equal to 0.0
-class Formatter: IValueFormatter {
+class Formatter: ValueFormatter {
   func stringForValue(_ value: Double, entry: ChartDataEntry, dataSetIndex: Int, viewPortHandler: ViewPortHandler?) -> String {
     return value == 0.0 ? "" : String.init(format: "%.0f", value.rounded())
   }
