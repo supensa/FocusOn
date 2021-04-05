@@ -1,4 +1,3 @@
-#  OpenClassrooms - iOS developer path - iOS Project 7
 ## FocusOn - iPhones, portrait - Core Data - Charts library
 
 This is a todo list application.<br/>
