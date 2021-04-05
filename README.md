@@ -1,5 +1,5 @@
 #  OpenClassrooms - iOS developer path - iOS Project 7
-## FocusOn - iPhones, portrait - Core Data - Charts (CocoaPods)
+## FocusOn - iPhones, portrait - Core Data - Charts library
 
 This is a todo list application.<br/>
 This application has three tabs:
@@ -9,6 +9,10 @@ This application has three tabs:
 
 ## Contact:
 If you have any questions contact me at <a href="mailto:spencer.forrest.ios@gmail.com">spencer.forrest.ios@gmail.com</a>
+
+## Charts library:
+This is the link of the library used to produce the charts on this app:
+<a href="https://github.com/danielgindi/Charts">Charts library</a>
 
 ## Notification:
 The application will send a notification 4 hours after the user's last visit to remind him/her to check his/her goal.
