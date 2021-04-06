@@ -9,9 +9,12 @@
 import UIKit
 
 class ViewController: UIViewController {
+  
+  /// Manage the core data stack
   var dataController: DataController {
     return _dataController
   }
+  
   private var _dataController: DataController!
   /// Has to be called in AppDelegate to Inject "DataController" Dependency
   ///

@@ -17,12 +17,14 @@ class TabBarController: UITabBarController {
   }
   
   override func viewDidAppear(_ animated: Bool) {
-    let title = Constant.notificationTitle
-    let body = Constant.notificationBody
-    // schedule (or remove) reminders
-    scheduleLocalNotification(title: title, body: body)
+    // Schedule (or remove) user notification
+    scheduleLocalNotification(title: Constant.notificationTitle, body: Constant.notificationBody)
   }
   
+  /// Schedule (or remove) user notification
+  /// - Parameters:
+  ///   - title: The localized title, containing the reason for the alert.
+  ///   - body: The localized message to display in the notification alert.
   func scheduleLocalNotification(title: String?, body: String?) {
     let identifier = Constant.notificationIdentifier
     let notificationCenter = UNUserNotificationCenter.current()
@@ -46,6 +48,8 @@ class TabBarController: UITabBarController {
   }
   
   /// Converts hours to seconds
+  /// - Parameter hour: hour as integer
+  /// - Returns: time interval in second
   private func hoursToSecond(_ hour: Int) -> TimeInterval{
     return TimeInterval(hour * 3600)
   }

@@ -10,19 +10,26 @@ import Foundation
 import CoreData
 import UIKit
 
+/// Setup and manage the core data stack
 class DataController {
-  // When 'DataController' is initialized in AppDelegate
-  // then "static var model" updates to current NSManagedOjectModel.
-  // This is needed for Unit Testing 'DataController'
-  // since we need to use the same NSManagedObjectModel in memory.
+  /// When 'DataController' is initialized in AppDelegate
+  /// then "static var model" updates to current NSManagedOjectModel.
+  /// This is needed for Unit Testing 'DataController'
+  /// since we need to use the same NSManagedObjectModel in memory.
   static var model: NSManagedObjectModel = NSManagedObjectModel()
   
   private var persistentContainer: NSPersistentContainer!
   
+  /// The managed object context associated with the main queue.(read-only)
   var context: NSManagedObjectContext {
     return persistentContainer.viewContext
   }
   
+  /// Initialize the core data stack
+  /// - Parameters:
+  ///   - name: The name used by the persistent container.
+  ///   - managedObjectModel: A programmatic representation of the .xcdatamodeld file describing your objects.
+  ///   - persistentStoreDescription: A description object used to create and load a persistent store.
   init(xcdatamodeldName name: String,
        managedObjectModel: NSManagedObjectModel? = nil,
        persistentStoreDescription: NSPersistentStoreDescription? = nil ) {
