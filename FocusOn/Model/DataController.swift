@@ -61,7 +61,7 @@ class DataController {
   /// - Throws: Exception if context could not save
   func saveContext() throws {
     if context.hasChanges {
-      return try self.context.save()
+       try self.context.save()
     }
   }
 }
